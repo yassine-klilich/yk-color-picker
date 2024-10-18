@@ -150,6 +150,21 @@ export const YKColorParser = {
     };
   },
 
+  HSVtoHSL: function (h: number, s: number, v: number) {
+    s /= 100;
+    v /= 100;
+
+    let l = ((2 - s) * v) / 2;
+
+    let newS = l !== 0 && l !== 1 ? (s * v) / (l < 0.5 ? l * 2 : 2 - l * 2) : 0;
+
+    return {
+      h: h,
+      s: newS * 100,
+      l: l * 100,
+    };
+  },
+
   HEXtoRGBA: function (hex: string) {
     let r = 0,
       g = 0,
@@ -185,6 +200,51 @@ export const YKColorParser = {
     return `#${hexPad2(Math.round(r))}${hexPad2(Math.round(g))}${hexPad2(
       Math.round(b)
     )}${a == 1 ? "" : hexPad2(Math.round(a * 255))}`;
+  },
+
+  HSVtoRGB: function (h: number, s: number, v: number) {
+    h /= 360;
+    s /= 100;
+    v /= 100;
+
+    let r = 0,
+      g = 0,
+      b = 0,
+      i,
+      f,
+      p,
+      q,
+      t;
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+      case 0:
+        (r = v), (g = t), (b = p);
+        break;
+      case 1:
+        (r = q), (g = v), (b = p);
+        break;
+      case 2:
+        (r = p), (g = v), (b = t);
+        break;
+      case 3:
+        (r = p), (g = q), (b = v);
+        break;
+      case 4:
+        (r = t), (g = p), (b = v);
+        break;
+      case 5:
+        (r = v), (g = p), (b = q);
+        break;
+    }
+    return {
+      r: Math.round(r * 255),
+      g: Math.round(g * 255),
+      b: Math.round(b * 255),
+    };
   },
 
   getNamedColor: function (color: string): string | undefined {
