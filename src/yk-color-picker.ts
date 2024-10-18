@@ -100,7 +100,7 @@ export class YKColorPicker {
 
   private _isOpen: boolean = false;
   private _options: __YKColorPickerOptions = YKColorPicker.DEFAULT_OPTIONS;
-  private _color: any = null;
+  private _color: YKColor = null;
   private _dom: any = {};
   private _currentRepresentation: any;
   private _dc: any;
@@ -153,6 +153,7 @@ export class YKColorPicker {
     } else {
       this._attachToBody();
     }
+    this._dom.cursor.focus();
     this._options.onOpen && this._options.onOpen(this);
   }
 
@@ -308,7 +309,7 @@ export class YKColorPicker {
   private _buildPaletteColor() {
     const paletteWrapper = createElement("div", ["yk-palette-wrapper"]);
     const palette = createElement("div", ["yk-palette"]);
-    const cursor = createElement("div", ["yk-cursor"]);
+    const cursor = createElement("a", ["yk-cursor"], { tabindex: 0 });
 
     paletteWrapper.appendChild(palette);
     paletteWrapper.appendChild(cursor);
@@ -862,6 +863,7 @@ export class YKColorPicker {
     if (this._dom.overlayWrapper.contains(e.target)) {
       this._dc = false;
     }
+    this._dom.cursor.focus();
   }
 
   private _onMouseMoveCursor(event: MouseEvent) {
@@ -963,7 +965,8 @@ export class YKColorPicker {
   }
 
   private _onChangeAlphaInput(event: Event) {
-    event.target && ((event.target as HTMLInputElement).value = this._color.a);
+    event.target &&
+      ((event.target as HTMLInputElement).value = this._color.a.toString());
   }
 
   private _onKeyDownInputHEX(event: KeyboardEvent) {
@@ -1188,8 +1191,9 @@ export class YKColorPicker {
                 let { r, g, b } = this._color.rgb;
                 r = Math.round(r);
                 if (r < 255) {
-                  this._color.rgb.r = (target as HTMLInputElement).value =
-                    (++r).toString();
+                  this._color.rgb.r = parseInt(
+                    ((target as HTMLInputElement).value = (++r).toString())
+                  );
                   this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this._rgbUpdateView();
                 }
@@ -1220,8 +1224,9 @@ export class YKColorPicker {
                 let { r, g, b } = this._color.rgb;
                 r = Math.round(r);
                 if (r > 0) {
-                  this._color.rgb.r = (target as HTMLInputElement).value =
-                    (--r).toString();
+                  this._color.rgb.r = parseInt(
+                    ((target as HTMLInputElement).value = (--r).toString())
+                  );
                   this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this._rgbUpdateView();
                 }
@@ -1308,8 +1313,9 @@ export class YKColorPicker {
                 let { r, g, b } = this._color.rgb;
                 g = Math.round(g);
                 if (g < 255) {
-                  this._color.rgb.g = (target as HTMLInputElement).value =
-                    (++g).toString();
+                  this._color.rgb.g = parseInt(
+                    ((target as HTMLInputElement).value = (++g).toString())
+                  );
                   this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this._rgbUpdateView();
                 }
@@ -1332,13 +1338,21 @@ export class YKColorPicker {
             case YKColorPickerMode.HSL:
               {
                 const { h, s, l } = this._color.hsl;
+
                 let hsl_s = Math.round(s);
+
                 if (hsl_s < 100) {
-                  (target as HTMLInputElement).value = ++hsl_s + "%";
-                  this._color.hsl.s = hsl_s;
-                  this._color.hsv.s = YKColorParser.HSLtoHSV(h, hsl_s, l).s;
+                  ++hsl_s;
+
+                  this._color.hsv = YKColorParser.HSLtoHSV(h, hsl_s, l);
+                  this._color.hsl = this._color.toHSL();
+
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
+
+                  (target as HTMLInputElement).value =
+                    Math.round(this._color.hsl.s) + "%";
+                  this._dom.inputC.value = Math.round(this._color.hsl.l) + "%";
                 }
               }
               break;
@@ -1353,8 +1367,9 @@ export class YKColorPicker {
                 let { r, g, b } = this._color.rgb;
                 g = Math.round(g);
                 if (g > 0) {
-                  this._color.rgb.g = (target as HTMLInputElement).value =
-                    (--g).toString();
+                  this._color.rgb.g = parseInt(
+                    ((target as HTMLInputElement).value = (--g).toString())
+                  );
                   this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this._rgbUpdateView();
                 }
@@ -1379,11 +1394,17 @@ export class YKColorPicker {
                 const { h, s, l } = this._color.hsl;
                 let hsl_s = Math.round(s);
                 if (hsl_s > 0) {
-                  (target as HTMLInputElement).value = --hsl_s + "%";
-                  this._color.hsl.s = hsl_s;
-                  this._color.hsv.s = YKColorParser.HSLtoHSV(h, hsl_s, l).s;
+                  --hsl_s;
+
+                  this._color.hsv = YKColorParser.HSLtoHSV(h, hsl_s, l);
+                  this._color.hsl = this._color.toHSL();
+
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
+
+                  (target as HTMLInputElement).value =
+                    Math.round(this._color.hsl.s) + "%";
+                  this._dom.inputC.value = Math.round(this._color.hsl.l) + "%";
                 }
               }
               break;
@@ -1424,10 +1445,12 @@ export class YKColorPicker {
           {
             const { h, l } = this._color.hsl;
             if (!isNaN(value) && value >= 0 && value <= 100) {
-              this._color.hsl.s = value;
               this._color.hsv = YKColorParser.HSLtoHSV(h, value, l);
+              this._color.hsl = this._color.toHSL();
               this._updateColorPreview(true);
               this._updateCursorThumb();
+
+              this._dom.inputC.value = Math.round(this._color.hsl.l) + "%";
             }
           }
           break;
@@ -1470,8 +1493,9 @@ export class YKColorPicker {
                 let { r, g, b } = this._color.rgb;
                 b = Math.round(b);
                 if (b < 255) {
-                  this._color.rgb.b = (target as HTMLInputElement).value =
-                    (++b).toString();
+                  this._color.rgb.b = parseInt(
+                    ((target as HTMLInputElement).value = (++b).toString())
+                  );
                   this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this._rgbUpdateView();
                 }
@@ -1496,11 +1520,17 @@ export class YKColorPicker {
                 const { h, s, l } = this._color.hsl;
                 let hsl_l = Math.round(l);
                 if (hsl_l < 100) {
-                  (target as HTMLInputElement).value = ++hsl_l + "%";
-                  this._color.hsl.l = hsl_l;
-                  this._color.hsv.v = YKColorParser.HSLtoHSV(h, s, hsl_l).v;
+                  ++hsl_l;
+
+                  this._color.hsv = YKColorParser.HSLtoHSV(h, s, hsl_l);
+                  this._color.hsl = this._color.toHSL();
+
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
+
+                  (target as HTMLInputElement).value =
+                    Math.round(this._color.hsl.l) + "%";
+                  this._dom.inputB.value = Math.round(this._color.hsl.s) + "%";
                 }
               }
               break;
@@ -1515,8 +1545,9 @@ export class YKColorPicker {
                 let { r, g, b } = this._color.rgb;
                 b = Math.round(b);
                 if (b > 0) {
-                  this._color.rgb.b = (target as HTMLInputElement).value =
-                    (--b).toString();
+                  this._color.rgb.b = parseInt(
+                    ((target as HTMLInputElement).value = (--b).toString())
+                  );
                   this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
                   this._rgbUpdateView();
                 }
@@ -1541,11 +1572,17 @@ export class YKColorPicker {
                 const { h, s, l } = this._color.hsl;
                 let hsl_l = Math.round(l);
                 if (l > 0) {
-                  (target as HTMLInputElement).value = --hsl_l + "%";
-                  this._color.hsl.l = hsl_l;
-                  this._color.hsv.v = YKColorParser.HSLtoHSV(h, s, hsl_l).v;
+                  --hsl_l;
+
+                  this._color.hsv = YKColorParser.HSLtoHSV(h, s, hsl_l);
+                  this._color.hsl = this._color.toHSL();
+
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
+
+                  (target as HTMLInputElement).value =
+                    Math.round(this._color.hsl.l) + "%";
+                  this._dom.inputB.value = Math.round(this._color.hsl.s) + "%";
                 }
               }
               break;
@@ -1586,10 +1623,12 @@ export class YKColorPicker {
           {
             const { h, s } = this._color.hsl;
             if (!isNaN(value) && value >= 0 && value <= 100) {
-              this._color.hsl.l = value;
               this._color.hsv = YKColorParser.HSLtoHSV(h, s, value);
+              this._color.hsl = this._color.toHSL();
               this._updateColorPreview(true);
               this._updateCursorThumb();
+
+              this._dom.inputB.value = Math.round(this._color.hsl.s) + "%";
             }
           }
           break;
