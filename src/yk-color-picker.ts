@@ -846,8 +846,7 @@ export class YKColorPicker {
 
   private _onClickTarget(event: MouseEvent) {
     event.stopPropagation();
-    if (this._isOpen) this.close();
-    else this.open();
+    this._isOpen ? this.close() : this.open();
   }
 
   private _onMouseDownCursor(event: MouseEvent) {
@@ -1789,16 +1788,22 @@ export class YKColorPicker {
   }
 
   private _onKeyUpClose(event: KeyboardEvent) {
+    const { target, key } = event;
+
+    if (target == this._options.target && key == "Enter") {
+      return;
+    }
+
     if (
-      event.key == "Enter" &&
+      key == "Enter" &&
       this._isOpen &&
-      ![this._dom.copyColor, this._dom.btnSwitch].includes(event.target)
+      ![this._dom.copyColor, this._dom.btnSwitch].includes(target)
     ) {
       this.close();
       return;
     }
 
-    if (event.key == "Escape") {
+    if (key == "Escape") {
       if (this._prevColor != this.getHEX()) {
         this.setColor(this._prevColor);
         this._updateGUI();
