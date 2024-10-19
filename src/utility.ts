@@ -29,6 +29,10 @@ export function attachEvent(
   element.addEventListener(eventName, eventHandler);
 }
 
+export function roundToRange(value: number, min: number, max: number) {
+  return Math.min(Math.max(Math.round(value), min), max);
+}
+
 export default {
   hexPad2,
   createElement,
