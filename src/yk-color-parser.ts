@@ -1,4 +1,4 @@
-import { hexPad2 } from "./utility";
+import { hexPad2, roundToRange } from "./utility";
 
 /**
  * Color Parser
@@ -141,12 +141,16 @@ export const YKColorParser = {
   },
 
   HSLtoHSV: function (h: number, s: number, l: number) {
-    const hsv1 = (s * (l < 50 ? l : 100 - l)) / 100;
+    s /= 100;
+    l /= 100;
+
+    let v = l + s * Math.min(l, 1 - l);
+    let hsvS = v == 0 ? 0 : 2 * (1 - l / v);
 
     return {
       h,
-      s: hsv1 === 0 ? 0 : ((2 * hsv1) / (l + hsv1)) * 100,
-      v: l + hsv1,
+      s: roundToRange(hsvS * 100, 0, 100),
+      v: roundToRange(v * 100, 0, 100),
     };
   },
 
@@ -155,13 +159,12 @@ export const YKColorParser = {
     v /= 100;
 
     let l = ((2 - s) * v) / 2;
-
     let newS = l !== 0 && l !== 1 ? (s * v) / (l < 0.5 ? l * 2 : 2 - l * 2) : 0;
 
     return {
-      h: h,
-      s: newS * 100,
-      l: l * 100,
+      h: roundToRange(h, 0, 360),
+      s: roundToRange(newS * 100, 0, 100),
+      l: roundToRange(l * 100, 0, 100),
     };
   },
 
@@ -197,9 +200,11 @@ export const YKColorParser = {
   },
 
   RGBAtoHEX: function (r: number, g: number, b: number, a: number) {
-    return `#${hexPad2(Math.round(r))}${hexPad2(Math.round(g))}${hexPad2(
-      Math.round(b)
-    )}${a == 1 ? "" : hexPad2(Math.round(a * 255))}`;
+    return `#${hexPad2(roundToRange(r, 0, 255))}${hexPad2(
+      roundToRange(g, 0, 255)
+    )}${hexPad2(roundToRange(b, 0, 255))}${
+      a == 1 ? "" : hexPad2(roundToRange(a, 0, 1) * 255)
+    }`;
   },
 
   HSVtoRGB: function (h: number, s: number, v: number) {
@@ -241,9 +246,9 @@ export const YKColorParser = {
         break;
     }
     return {
-      r: Math.round(r * 255),
-      g: Math.round(g * 255),
-      b: Math.round(b * 255),
+      r: roundToRange(r * 255, 0, 255),
+      g: roundToRange(g * 255, 0, 255),
+      b: roundToRange(b * 255, 0, 255),
     };
   },
 

@@ -39,7 +39,7 @@
     <script type="module">
       import { YKColorPicker, YKColorPickerPosition } from "yk-color-picker";
 
-      const colorPicker = new YKColorPicker({
+      window.colorPicker = new YKColorPicker({
         target: document.getElementById("colorBox"),
         // container: "container",
         onInit: function (instance) {

@@ -21,8 +21,8 @@ export default defineConfig({
           preserveModules: false,
         },
         {
-          format: "iife",
-          dir: "dist/iife2020",
+          format: "umd",
+          dir: "dist/umd2020",
           entryFileNames: "yk-color-picker.js",
           name: "YK",
           strict: true,

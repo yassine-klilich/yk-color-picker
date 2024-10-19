@@ -1,3 +1,4 @@
+import { roundToRange } from "./utility";
 import { YKColorParser } from "./yk-color-parser";
 
 /**
@@ -16,6 +17,30 @@ export class YKColor {
     this.rgb = this.toRGB();
     this.hsl = this.toHSL();
     this.hex = this.toHEX();
+  }
+
+  getRGB() {
+    return {
+      r: roundToRange(this.rgb.r, 0, 255),
+      g: roundToRange(this.rgb.g, 0, 255),
+      b: roundToRange(this.rgb.b, 0, 255),
+    };
+  }
+
+  getHSV() {
+    return {
+      h: roundToRange(this.hsv.h, 0, 360),
+      s: roundToRange(this.hsv.s, 0, 100),
+      v: roundToRange(this.hsv.v, 0, 100),
+    };
+  }
+
+  getHSL() {
+    return {
+      h: roundToRange(this.hsl.h, 0, 360),
+      s: roundToRange(this.hsl.s, 0, 100),
+      l: roundToRange(this.hsl.l, 0, 100),
+    };
   }
 
   toRGB() {

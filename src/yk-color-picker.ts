@@ -2,7 +2,7 @@ import "./style.css";
 
 import { YKColor } from "./yk-color";
 import { YKColorParser } from "./yk-color-parser";
-import { hexPad2, createElement, attachEvent } from "./utility";
+import { hexPad2, createElement, attachEvent, roundToRange } from "./utility";
 
 type Point = {
   x: number;
@@ -173,11 +173,11 @@ export class YKColorPicker {
   }
 
   getHSV() {
-    const { h, s, v } = this._color.hsv;
+    const { h, s, v } = this._color.getHSV();
     return {
-      h: Math.round(h),
-      s: Math.round(s),
-      v: Math.round(v),
+      h,
+      s,
+      v,
       a: this._color.a,
     };
   }
@@ -185,9 +185,9 @@ export class YKColorPicker {
   getHSL() {
     const { h, s, l } = this._color.toHSL();
     return {
-      h: Math.round(h),
-      s: Math.round(s),
-      l: Math.round(l),
+      h,
+      s,
+      l,
       a: this._color.a,
     };
   }
@@ -229,31 +229,31 @@ export class YKColorPicker {
   getColor() {
     switch (this._currentRepresentation) {
       case YKColorPickerMode.RGB: {
-        const { r, g, b } = this._color.rgb;
+        const { r, g, b } = this._color.getRGB();
         return {
-          r: Math.round(r),
-          g: Math.round(g),
-          b: Math.round(b),
+          r,
+          g,
+          b,
           a: this._color.a,
         };
       }
 
       case YKColorPickerMode.HSV: {
-        const { h, s, v } = this._color.hsv;
+        const { h, s, v } = this._color.getHSV();
         return {
-          h: Math.round(h),
-          s: Math.round(s),
-          l: Math.round(v),
+          h,
+          s,
+          v,
           a: this._color.a,
         };
       }
 
       case YKColorPickerMode.HSL: {
-        const { h, s, l } = this._color.hsl;
+        const { h, s, l } = this._color.getHSL();
         return {
-          h: Math.round(h),
-          s: Math.round(s),
-          l: Math.round(l),
+          h,
+          s,
+          l,
           a: this._color.a,
         };
       }
@@ -319,6 +319,7 @@ export class YKColorPicker {
     this._onMouseUpCursorBind = this._onMouseUpCursor.bind(this);
     this._onMouseMoveCursorBind = this._onMouseMoveCursor.bind(this);
     attachEvent(paletteWrapper, "pointerdown", this._onMouseDownCursorBind);
+    attachEvent(cursor, "keydown", this._onKeydownCursor.bind(this));
 
     this._dom["palette"] = palette;
     this._dom["cursor"] = cursor;
@@ -479,7 +480,11 @@ export class YKColorPicker {
     }px`;
   }
 
-  private _setQuadrupedValue(a: string, b: string, c: string) {
+  private _setQuadrupedValue(
+    a: string | number,
+    b: string | number,
+    c: string | number
+  ) {
     this._dom["inputA"].value = a;
     this._dom["inputB"].value = b;
     this._dom["inputC"].value = c;
@@ -505,33 +510,21 @@ export class YKColorPicker {
       case YKColorPickerMode.RGB:
         {
           const { r, g, b } = (this._color.rgb = this._color.toRGB());
-          this._setQuadrupedValue(
-            Math.round(r).toString(),
-            Math.round(g).toString(),
-            Math.round(b).toString()
-          );
+          this._setQuadrupedValue(r, g, b);
         }
         break;
 
       case YKColorPickerMode.HSV:
         {
-          const { h, s, v } = this._color.hsv;
-          this._setQuadrupedValue(
-            `${Math.round(h)}°`,
-            `${Math.round(s)}%`,
-            `${Math.round(v)}%`
-          );
+          const { h, s, v } = this._color.getHSV();
+          this._setQuadrupedValue(`${h}°`, `${s}%`, `${v}%`);
         }
         break;
 
       case YKColorPickerMode.HSL:
         {
           const { h, s, l } = (this._color.hsl = this._color.toHSL());
-          this._setQuadrupedValue(
-            `${Math.round(h)}°`,
-            `${Math.round(s)}%`,
-            `${Math.round(l)}%`
-          );
+          this._setQuadrupedValue(`${h}°`, `${s}%`, `${l}%`);
         }
         break;
 
@@ -564,7 +557,7 @@ export class YKColorPicker {
 
   private _updateCursorThumb() {
     const { palette, cursor } = this._dom;
-    const { s, v } = this._color.hsv;
+    const { s, v } = this._color.getHSV();
     cursor.style.translate = `${(s / 100) * palette.offsetWidth}px ${
       palette.offsetHeight - (v / 100) * palette.offsetHeight
     }px`;
@@ -727,7 +720,7 @@ export class YKColorPicker {
       rgb[color] = op(rgb[color], 1);
       this._color.hex =
         hex.substring(0, startSelect) +
-        hexPad2(Math.round(rgb[color])) +
+        hexPad2(roundToRange(rgb[color], 0, 255)) +
         hex.substring(endSelect);
       const { r, g, b } = rgb;
       this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
@@ -749,7 +742,8 @@ export class YKColorPicker {
     if (con(a, conValue)) {
       this._color.a = parseFloat(op(a, 0.01).toFixed(2));
       target.value = this._color.hex =
-        hex.substring(0, 7) + hexPad2(Math.round(this._color.a * 255));
+        hex.substring(0, 7) +
+        hexPad2(roundToRange(this._color.a * 255, 0, 255));
       this._updateColorPreview(true);
       this._updateOpacityThumb();
     }
@@ -845,6 +839,52 @@ export class YKColorPicker {
     this._isOpen = false;
   }
 
+  private _onKeydownCursor(event: KeyboardEvent) {
+    if (
+      ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"].includes(event.key)
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      switch (event.key) {
+        case "ArrowUp":
+          {
+            let value = Math.round(this._color.hsv.v);
+            if (value < 100) {
+              this._color.hsv.v = value + 1;
+            }
+          }
+          break;
+        case "ArrowDown":
+          {
+            let value = Math.round(this._color.hsv.v);
+            if (value > 0) {
+              this._color.hsv.v = value - 1;
+            }
+          }
+          break;
+        case "ArrowRight":
+          {
+            let value = Math.round(this._color.hsv.s);
+            if (value < 100) {
+              this._color.hsv.s = value + 1;
+            }
+          }
+          break;
+        case "ArrowLeft":
+          {
+            let value = Math.round(this._color.hsv.s);
+            if (value > 0) {
+              this._color.hsv.s = value - 1;
+            }
+          }
+          break;
+      }
+      this._updateCursorThumb();
+      this._updateInputsValue();
+      this._updateColorPreview(true);
+    }
+  }
+
   private _onClickTarget(event: MouseEvent) {
     event.stopPropagation();
     this._isOpen ? this.close() : this.open();
@@ -896,13 +936,13 @@ export class YKColorPicker {
   private _onFocusInput() {
     switch (this._currentRepresentation) {
       case YKColorPickerMode.RGB:
-        this._color.rgb = this.getRGB();
+        this._color.rgb = this._color.getRGB();
         break;
       case YKColorPickerMode.HSV:
-        this._color.hsv = this.getHSV();
+        this._color.hsv = this._color.getHSV();
         break;
       case YKColorPickerMode.HSL:
-        this._color.hsl = this.getHSL();
+        this._color.hsl = this._color.getHSL();
         break;
       case YKColorPickerMode.HEX:
         this._updateHEXColor();
@@ -1188,8 +1228,7 @@ export class YKColorPicker {
           switch (this._currentRepresentation) {
             case YKColorPickerMode.RGB:
               {
-                let { r, g, b } = this._color.rgb;
-                r = Math.round(r);
+                let { r, g, b } = this._color.getRGB();
                 if (r < 255) {
                   this._color.rgb.r = parseInt(
                     ((target as HTMLInputElement).value = (++r).toString())
@@ -1204,7 +1243,7 @@ export class YKColorPicker {
             case YKColorPickerMode.HSL:
               {
                 let { h } = this._color.hsv;
-                h = Math.round(h);
+                h = roundToRange(h, 0, 360);
                 if (h < 360) {
                   (target as HTMLInputElement).value = ++h + "°";
                   this._color.hsv.h = this._color.hsl.h = h;
@@ -1221,8 +1260,7 @@ export class YKColorPicker {
           switch (this._currentRepresentation) {
             case YKColorPickerMode.RGB:
               {
-                let { r, g, b } = this._color.rgb;
-                r = Math.round(r);
+                let { r, g, b } = this._color.getRGB();
                 if (r > 0) {
                   this._color.rgb.r = parseInt(
                     ((target as HTMLInputElement).value = (--r).toString())
@@ -1237,7 +1275,7 @@ export class YKColorPicker {
             case YKColorPickerMode.HSL:
               {
                 let { h } = this._color.hsv;
-                h = Math.round(h);
+                h = roundToRange(h, 0, 360);
                 if (h > 0) {
                   (target as HTMLInputElement).value = --h + "°";
                   this._color.hsv.h = this._color.hsl.h = h;
@@ -1258,7 +1296,7 @@ export class YKColorPicker {
       switch (this._currentRepresentation) {
         case YKColorPickerMode.RGB:
           {
-            const { g, b } = this._color.rgb;
+            const { g, b } = this._color.getRGB();
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this._color.rgb.r = value;
               this._color.hsv = YKColorParser.RGBtoHSV(value, g, b);
@@ -1288,14 +1326,14 @@ export class YKColorPicker {
     switch (this._currentRepresentation) {
       case YKColorPickerMode.RGB:
         {
-          value = Math.round(this._color.rgb.r).toString();
+          value = roundToRange(this._color.rgb.r, 0, 255).toString();
         }
         break;
 
       case YKColorPickerMode.HSV:
       case YKColorPickerMode.HSL:
         {
-          value = `${Math.round(this._color.hsv.h)}°`;
+          value = `${this._color.getHSV().h}°`;
         }
         break;
     }
@@ -1310,8 +1348,7 @@ export class YKColorPicker {
           switch (this._currentRepresentation) {
             case YKColorPickerMode.RGB:
               {
-                let { r, g, b } = this._color.rgb;
-                g = Math.round(g);
+                let { r, g, b } = this._color.getRGB();
                 if (g < 255) {
                   this._color.rgb.g = parseInt(
                     ((target as HTMLInputElement).value = (++g).toString())
@@ -1324,8 +1361,7 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSV:
               {
-                let { s } = this._color.hsv;
-                s = Math.round(s);
+                let { s } = this._color.getHSV();
                 if (s < 100) {
                   (target as HTMLInputElement).value = ++s + "%";
                   this._color.hsv.s = s;
@@ -1337,22 +1373,22 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSL:
               {
-                const { h, s, l } = this._color.hsl;
+                console.log(this._color.hsv.s);
 
-                let hsl_s = Math.round(s);
-
+                const { h, s, l } = this._color.getHSL();
+                let hsl_s = s;
                 if (hsl_s < 100) {
                   ++hsl_s;
 
+                  this._color.hsl.s = hsl_s;
                   this._color.hsv = YKColorParser.HSLtoHSV(h, hsl_s, l);
-                  this._color.hsl = this._color.toHSL();
+                  this._color.hsl.l = this.getHSL().l;
 
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
 
-                  (target as HTMLInputElement).value =
-                    Math.round(this._color.hsl.s) + "%";
-                  this._dom.inputC.value = Math.round(this._color.hsl.l) + "%";
+                  (target as HTMLInputElement).value = hsl_s + "%";
+                  this._dom.inputC.value = this._color.hsl.l + "%";
                 }
               }
               break;
@@ -1364,8 +1400,7 @@ export class YKColorPicker {
           switch (this._currentRepresentation) {
             case YKColorPickerMode.RGB:
               {
-                let { r, g, b } = this._color.rgb;
-                g = Math.round(g);
+                let { r, g, b } = this._color.getRGB();
                 if (g > 0) {
                   this._color.rgb.g = parseInt(
                     ((target as HTMLInputElement).value = (--g).toString())
@@ -1378,8 +1413,7 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSV:
               {
-                let { s } = this._color.hsv;
-                s = Math.round(s);
+                let { s } = this._color.getHSV();
                 if (s > 0) {
                   (target as HTMLInputElement).value = --s + "%";
                   this._color.hsv.s = s;
@@ -1391,20 +1425,20 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSL:
               {
-                const { h, s, l } = this._color.hsl;
-                let hsl_s = Math.round(s);
+                const { h, s, l } = this._color.getHSL();
+                let hsl_s = s;
                 if (hsl_s > 0) {
                   --hsl_s;
 
+                  this._color.hsl.s = hsl_s;
                   this._color.hsv = YKColorParser.HSLtoHSV(h, hsl_s, l);
-                  this._color.hsl = this._color.toHSL();
+                  this._color.hsl.l = this.getHSL().l;
 
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
 
-                  (target as HTMLInputElement).value =
-                    Math.round(this._color.hsl.s) + "%";
-                  this._dom.inputC.value = Math.round(this._color.hsl.l) + "%";
+                  (target as HTMLInputElement).value = hsl_s + "%";
+                  this._dom.inputC.value = this._color.hsl.l + "%";
                 }
               }
               break;
@@ -1420,7 +1454,7 @@ export class YKColorPicker {
       switch (this._currentRepresentation) {
         case YKColorPickerMode.RGB:
           {
-            const { r, b } = this._color.rgb;
+            const { r, b } = this._color.getRGB();
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this._color.rgb.g = value;
               this._color.hsv = YKColorParser.RGBtoHSV(r, value, b);
@@ -1443,7 +1477,7 @@ export class YKColorPicker {
 
         case YKColorPickerMode.HSL:
           {
-            const { h, l } = this._color.hsl;
+            const { h, l } = this._color.getHSL();
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this._color.hsv = YKColorParser.HSLtoHSV(h, value, l);
               this._color.hsl = this._color.toHSL();
@@ -1459,27 +1493,27 @@ export class YKColorPicker {
   }
 
   private _onChangeInputB(event: Event) {
-    let value = (event.target as HTMLInputElement).value;
+    let value: string | number = (event.target as HTMLInputElement).value;
     switch (this._currentRepresentation) {
       case YKColorPickerMode.RGB:
         {
-          value = Math.round(this._color.rgb.g).toString();
+          value = this._color.getRGB().g;
         }
         break;
 
       case YKColorPickerMode.HSV:
         {
-          value = `${Math.round(this._color.hsv.s)}%`;
+          value = `${this._color.getHSV().s}%`;
         }
         break;
 
       case YKColorPickerMode.HSL:
         {
-          value = `${Math.round(this._color.hsl.s)}%`;
+          value = `${this._color.getHSL().s}%`;
         }
         break;
     }
-    (event.target as HTMLInputElement).value = value;
+    (event.target as HTMLInputElement).value = value as string;
   }
 
   private _onKeyDownInputC(event: KeyboardEvent) {
@@ -1490,8 +1524,7 @@ export class YKColorPicker {
           switch (this._currentRepresentation) {
             case YKColorPickerMode.RGB:
               {
-                let { r, g, b } = this._color.rgb;
-                b = Math.round(b);
+                let { r, g, b } = this._color.getRGB();
                 if (b < 255) {
                   this._color.rgb.b = parseInt(
                     ((target as HTMLInputElement).value = (++b).toString())
@@ -1504,8 +1537,7 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSV:
               {
-                let { v } = this._color.hsv;
-                v = Math.round(v);
+                let { v } = this._color.getHSV();
                 if (v < 100) {
                   (target as HTMLInputElement).value = ++v + "%";
                   this._color.hsv.v = v;
@@ -1517,20 +1549,20 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSL:
               {
-                const { h, s, l } = this._color.hsl;
-                let hsl_l = Math.round(l);
+                const { h, s, l } = this._color.getHSL();
+                let hsl_l = l;
                 if (hsl_l < 100) {
                   ++hsl_l;
 
+                  this._color.hsl.l = hsl_l;
                   this._color.hsv = YKColorParser.HSLtoHSV(h, s, hsl_l);
-                  this._color.hsl = this._color.toHSL();
+                  this._color.hsl.s = this.getHSL().s;
 
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
 
-                  (target as HTMLInputElement).value =
-                    Math.round(this._color.hsl.l) + "%";
-                  this._dom.inputB.value = Math.round(this._color.hsl.s) + "%";
+                  (target as HTMLInputElement).value = hsl_l + "%";
+                  this._dom.inputB.value = this._color.hsl.s + "%";
                 }
               }
               break;
@@ -1542,8 +1574,7 @@ export class YKColorPicker {
           switch (this._currentRepresentation) {
             case YKColorPickerMode.RGB:
               {
-                let { r, g, b } = this._color.rgb;
-                b = Math.round(b);
+                let { r, g, b } = this._color.getRGB();
                 if (b > 0) {
                   this._color.rgb.b = parseInt(
                     ((target as HTMLInputElement).value = (--b).toString())
@@ -1556,8 +1587,7 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSV:
               {
-                let { v } = this._color.hsv;
-                v = Math.round(v);
+                let { v } = this._color.getHSV();
                 if (v > 0) {
                   (target as HTMLInputElement).value = --v + "%";
                   this._color.hsv.v = v;
@@ -1569,20 +1599,20 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSL:
               {
-                const { h, s, l } = this._color.hsl;
-                let hsl_l = Math.round(l);
+                const { h, s, l } = this._color.getHSL();
+                let hsl_l = l;
                 if (l > 0) {
                   --hsl_l;
 
+                  this._color.hsl.l = hsl_l;
                   this._color.hsv = YKColorParser.HSLtoHSV(h, s, hsl_l);
-                  this._color.hsl = this._color.toHSL();
+                  this._color.hsl.s = this.getHSL().s;
 
                   this._updateColorPreview(true);
                   this._updateCursorThumb();
 
-                  (target as HTMLInputElement).value =
-                    Math.round(this._color.hsl.l) + "%";
-                  this._dom.inputB.value = Math.round(this._color.hsl.s) + "%";
+                  (target as HTMLInputElement).value = hsl_l + "%";
+                  this._dom.inputB.value = this._color.hsl.s + "%";
                 }
               }
               break;
@@ -1598,7 +1628,7 @@ export class YKColorPicker {
       switch (this._currentRepresentation) {
         case YKColorPickerMode.RGB:
           {
-            const { r, g } = this._color.rgb;
+            const { r, g } = this._color.getRGB();
             if (!isNaN(value) && value >= 0 && value <= 255) {
               this._color.rgb.b = value;
               this._color.hsv = YKColorParser.RGBtoHSV(r, g, value);
@@ -1621,9 +1651,10 @@ export class YKColorPicker {
 
         case YKColorPickerMode.HSL:
           {
-            const { h, s } = this._color.hsl;
+            const { h, s } = this._color.getHSL();
             if (!isNaN(value) && value >= 0 && value <= 100) {
               this._color.hsv = YKColorParser.HSLtoHSV(h, s, value);
+
               this._color.hsl = this._color.toHSL();
               this._updateColorPreview(true);
               this._updateCursorThumb();
@@ -1637,27 +1668,27 @@ export class YKColorPicker {
   }
 
   private _onChangeInputC(event: Event) {
-    let value = (event.target as HTMLInputElement).value;
+    let value: string | number = (event.target as HTMLInputElement).value;
     switch (this._currentRepresentation) {
       case YKColorPickerMode.RGB:
         {
-          value = Math.round(this._color.rgb.b).toString();
+          value = this._color.getRGB().b;
         }
         break;
 
       case YKColorPickerMode.HSV:
         {
-          value = `${Math.round(this._color.hsv.v)}%`;
+          value = `${this._color.getHSV().v}%`;
         }
         break;
 
       case YKColorPickerMode.HSL:
         {
-          value = `${Math.round(this._color.hsl.l)}%`;
+          value = `${this._color.getHSL().l}%`;
         }
         break;
     }
-    (event.target as HTMLInputElement).value = value;
+    (event.target as HTMLInputElement).value = value as string;
   }
 
   private _onClickCopyColor() {
@@ -1909,23 +1940,17 @@ export class YKColorPicker {
   private _getColorText() {
     switch (this._currentRepresentation) {
       case YKColorPickerMode.RGB:
-        const { r, g, b } = this._color.rgb;
-        return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${
-          this._color.a
-        })`;
+        const { r, g, b } = this._color.getRGB();
+        return `rgba(${r}, ${g}, ${b}, ${this._color.a})`;
 
       case YKColorPickerMode.HSV: {
-        const { h, s, v } = this._color.hsv;
-        return `hsva(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(v)}%, ${
-          this._color.a
-        })`;
+        const { h, s, v } = this._color.getHSV();
+        return `hsva(${h}, ${s}%, ${v}%, ${this._color.a})`;
       }
 
       case YKColorPickerMode.HSL: {
-        const { h, s, l } = this._color.hsl;
-        return `hsla(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%, ${
-          this._color.a
-        })`;
+        const { h, s, l } = this._color.getHSL();
+        return `hsla(${h}, ${s}%, ${l}%, ${this._color.a})`;
       }
 
       case YKColorPickerMode.HEX:
