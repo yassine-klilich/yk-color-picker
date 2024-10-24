@@ -5,6 +5,9 @@ import dts from "vite-plugin-dts";
 import { cleandir } from "rollup-plugin-cleandir";
 
 export default defineConfig({
+  esbuild: {
+    drop: ["console", "debugger"],
+  },
   build: {
     lib: {
       entry: "./src/index.ts",
