@@ -50,8 +50,8 @@ export enum YKColorPickerMode {
 }
 
 export interface YKColorPickerOptions {
-  target: HTMLElement | undefined;
-  container: HTMLElement | string | undefined;
+  target?: HTMLElement | null;
+  container?: HTMLElement | string | null;
   position?: YKColorPickerPosition;
   positionFallback?: YKColorPickerPositionFallback;
   representation?: YKColorPickerMode;
@@ -79,8 +79,8 @@ interface __YKColorPickerOptions extends Required<YKColorPickerOptions> {}
  */
 export class YKColorPicker {
   static DEFAULT_OPTIONS: __YKColorPickerOptions = {
-    target: undefined,
-    container: undefined,
+    target: null,
+    container: null,
     position: YKColorPickerPosition.BOTTOM,
     positionFallback: "btrl",
     representation: YKColorPickerMode.RGB,
@@ -100,7 +100,7 @@ export class YKColorPicker {
 
   private _isOpen: boolean = false;
   private _options: __YKColorPickerOptions = YKColorPicker.DEFAULT_OPTIONS;
-  private _color: YKColor = null;
+  private _color: YKColor = new YKColor(0, 0, 0, 1);
   private _dom: any = {};
   private _currentRepresentation: any;
   private _dc: any;
@@ -716,11 +716,11 @@ export class YKColorPicker {
   ) {
     const target = event.target as HTMLInputElement;
     const { rgb, hex } = this._color;
-    if (con(rgb[color], conValue)) {
-      rgb[color] = op(rgb[color], 1);
+    if (con((rgb as any)[color], conValue)) {
+      (rgb as any)[color] = op((rgb as any)[color], 1);
       this._color.hex =
         hex.substring(0, startSelect) +
-        hexPad2(roundToRange(rgb[color], 0, 255)) +
+        hexPad2(roundToRange((rgb as any)[color], 0, 255)) +
         hex.substring(endSelect);
       const { r, g, b } = rgb;
       this._color.hsv = YKColorParser.RGBtoHSV(r, g, b);
@@ -778,7 +778,7 @@ export class YKColorPicker {
     if (!this._options.container) {
       throw new Error("YKColorPicker:: container is not defined");
     }
-    let _container: HTMLElement | string | null = null;
+    let _container: HTMLElement | null = null;
     if (typeof this._options.container == "string") {
       _container = document.getElementById(this._options.container);
     } else {
@@ -1699,7 +1699,7 @@ export class YKColorPicker {
     input.style.position = "absolute";
     input.style.left = "-99999px";
     input.style.top = "-99999px";
-    input.value = this._getColorText();
+    input.value = this._getColorText() || "";
     document.body.appendChild(input);
     input.select();
 
@@ -1895,7 +1895,7 @@ export class YKColorPicker {
       if (target == null) {
         return;
       }
-      if (!YKColorPicker._isTargetInViewport(this._options.target)) {
+      if (!YKColorPicker._isTargetInViewport(target)) {
         this.close();
         return;
       }
