@@ -27,26 +27,59 @@ export declare class YKColorPicker {
     private _onMouseUpCursorBind;
     private _copyTimeout;
     private _prevColor;
+    private _targetKeydownOpen;
     constructor(options: YKColorPickerOptions);
     isOpen(): boolean;
     open(): void;
     close(): void;
-    getRGB(): any;
+    getRGB(): {
+        a: number;
+        r: number;
+        g: number;
+        b: number;
+    };
     getHSV(): {
         h: number;
         s: number;
         v: number;
-        a: any;
+        a: number;
     };
     getHSL(): {
         h: number;
         s: number;
         l: number;
-        a: any;
+        a: number;
     };
-    getHEX(): any;
+    getHEX(): string;
     updateOptions(options: YKColorPickerOptions): void;
-    getColor(): any;
+    getColor(): string | {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+        h?: undefined;
+        s?: undefined;
+        v?: undefined;
+        l?: undefined;
+    } | {
+        h: number;
+        s: number;
+        v: number;
+        a: number;
+        r?: undefined;
+        g?: undefined;
+        b?: undefined;
+        l?: undefined;
+    } | {
+        h: number;
+        s: number;
+        l: number;
+        a: number;
+        r?: undefined;
+        g?: undefined;
+        b?: undefined;
+        v?: undefined;
+    } | undefined;
     setColor(value: string): void;
     private _initDOM;
     private _updateGUI;
@@ -81,6 +114,7 @@ export declare class YKColorPicker {
     private _attachToContainer;
     private _attachToBody;
     private _detachOverlay;
+    private _onKeydownCursor;
     private _onClickTarget;
     private _onMouseDownCursor;
     private _onMouseUpCursor;
@@ -140,15 +174,15 @@ export declare enum YKColorPickerMode {
 }
 
 export declare interface YKColorPickerOptions {
-    target: HTMLElement | undefined;
-    container: HTMLElement | string | undefined;
+    target?: HTMLElement | null;
+    container?: HTMLElement | string | null;
     position?: YKColorPickerPosition;
     positionFallback?: YKColorPickerPositionFallback;
     representation?: YKColorPickerMode;
     color?: string;
     closeOnScroll?: boolean;
     closeOnResize?: boolean;
-    theme?: string;
+    theme?: "light" | "dark";
     onInit?: (instance: YKColorPicker) => void;
     onOpen?: (instance: YKColorPicker) => void;
     onClose?: (instance: YKColorPicker) => void;
