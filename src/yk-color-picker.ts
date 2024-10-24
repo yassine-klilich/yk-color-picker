@@ -58,7 +58,7 @@ export interface YKColorPickerOptions {
   color?: string;
   closeOnScroll?: boolean;
   closeOnResize?: boolean;
-  theme?: string;
+  theme?: "light" | "dark";
   onInit?: (instance: YKColorPicker) => void;
   onOpen?: (instance: YKColorPicker) => void;
   onClose?: (instance: YKColorPicker) => void;
@@ -793,13 +793,13 @@ export class YKColorPicker {
     const { overlayWrapper } = this._dom;
     const parent = overlayWrapper.parentElement;
     _container.appendChild(overlayWrapper);
-    overlayWrapper.classList.remove(
-      "yk-overlay-wrapper--light",
-      "yk-overlay-wrapper--dark"
+    overlayWrapper.className = "";
+    overlayWrapper.classList.add(
+      "yk-overlay-wrapper",
+      "yk-overlay-wrapper--static",
+      "yk-overlay-wrapper--open",
+      "yk-overlay-wrapper--" + this._options.theme
     );
-    overlayWrapper.classList.add("yk-overlay-wrapper--static");
-    overlayWrapper.classList.add("yk-overlay-wrapper--open");
-    overlayWrapper.classList.add("yk-overlay-wrapper--" + this._options.theme);
     this._updateGUI();
     this._isOpen = true;
     if (callEvent && parent != overlayWrapper.parentElement) {
@@ -813,13 +813,12 @@ export class YKColorPicker {
     const { overlayWrapper } = this._dom;
     const parent = overlayWrapper.parentElement;
     document.body.appendChild(overlayWrapper);
-    overlayWrapper.classList.remove(
-      "yk-overlay-wrapper--light",
-      "yk-overlay-wrapper--dark"
+    overlayWrapper.className = "";
+    overlayWrapper.classList.add(
+      "yk-overlay-wrapper",
+      "yk-overlay-wrapper--open",
+      "yk-overlay-wrapper--" + this._options.theme
     );
-    overlayWrapper.classList.remove("yk-overlay-wrapper--static");
-    overlayWrapper.classList.add("yk-overlay-wrapper--open");
-    overlayWrapper.classList.add("yk-overlay-wrapper--" + this._options.theme);
     this._updateGUI();
     this._updatePosition();
     attachEvent(window, "resize", this._onResizeScrollWindowBind);
