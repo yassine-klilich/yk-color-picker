@@ -119,6 +119,7 @@ export class YKColorPicker {
   private _onMouseUpCursorBind: any;
   private _copyTimeout: any = null;
   private _prevColor: any = null;
+  private _targetKeydownOpen: boolean = false;
 
   constructor(options: YKColorPickerOptions) {
     this._options = YKColorPicker._buildOptions(
@@ -836,6 +837,7 @@ export class YKColorPicker {
     this._dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open");
     this._removeWindowEvents();
     this._isOpen = false;
+    this._options.target?.focus();
   }
 
   private _onKeydownCursor(event: KeyboardEvent) {
@@ -886,6 +888,7 @@ export class YKColorPicker {
 
   private _onClickTarget(event: MouseEvent) {
     event.stopPropagation();
+    this._targetKeydownOpen = true;
     this._isOpen ? this.close() : this.open();
   }
 
@@ -1858,8 +1861,8 @@ export class YKColorPicker {
 
   private _onKeyUpClose(event: KeyboardEvent) {
     const { target, key } = event;
-
-    if (target == this._options.target && key == "Enter") {
+    if (this._targetKeydownOpen && key == "Enter") {
+      this._targetKeydownOpen = false;
       return;
     }
 
