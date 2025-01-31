@@ -20,10 +20,6 @@
   position: static;
 }
 
-.color-picker {
-  display: inline-block;
-}
-
 .yk-wrapper {
   box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 10px;
   display: inline-block;
@@ -192,6 +188,7 @@
   font-size: 12px;
   text-align: center;
   width: 42px;
+  border-radius: 4px;
 }
 .yk-hex-input .yk-color-input {
   width: 180px;

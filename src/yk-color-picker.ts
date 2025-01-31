@@ -138,9 +138,12 @@ export class YKColorPicker {
       attachEvent(target, "click", this._onClickTargetBind);
     }
 
-    this.setColor(this._options.color);
-    this._prevColor = this.getHEX();
     this._initDOM();
+    this.setColor(this._options.color);
+  }
+
+  public get options(): YKColorPickerOptions {
+    return this._options;
   }
 
   isOpen() {
@@ -219,11 +222,17 @@ export class YKColorPicker {
     }
 
     if (this._isOpen) {
-      if (this._options.container) {
-        this._attachToContainer(true);
-      } else {
-        this._attachToBody();
+      if (options.hasOwnProperty("container")) {
+        if (options.container) {
+          this._attachToContainer(true);
+        } else {
+          this._attachToBody();
+        }
       }
+    }
+
+    if (options.color) {
+      this.setColor(options.color);
     }
   }
 
@@ -267,6 +276,8 @@ export class YKColorPicker {
   setColor(value: string) {
     const { h, s, v, a } = YKColorParser.parse(value);
     this._color = new YKColor(h, s, v, a);
+    this._updateGUI();
+    this._options.onInput(this);
   }
 
   private _initDOM() {
@@ -404,23 +415,35 @@ export class YKColorPicker {
     const inputA = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
+      id: "yk-color-input-1",
     });
     const inputB = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
+      id: "yk-color-input-2",
     });
     const inputC = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
+      id: "yk-color-input-3",
     });
     const inputD = createElement("input", ["yk-color-input"], {
       type: "text",
       inputmode: "numeric",
+      id: "yk-color-input-4",
     });
-    const labelA = createElement("label", ["yk-color-model-label"]);
-    const labelB = createElement("label", ["yk-color-model-label"]);
-    const labelC = createElement("label", ["yk-color-model-label"]);
-    const labelD = createElement("label", ["yk-color-model-label"]);
+    const labelA = createElement("label", ["yk-color-model-label"], {
+      for: "yk-color-input-1",
+    });
+    const labelB = createElement("label", ["yk-color-model-label"], {
+      for: "yk-color-input-2",
+    });
+    const labelC = createElement("label", ["yk-color-model-label"], {
+      for: "yk-color-input-3",
+    });
+    const labelD = createElement("label", ["yk-color-model-label"], {
+      for: "yk-color-input-4",
+    });
 
     // Set labels' text
     const model = this._currentRepresentation.toUpperCase();
@@ -781,7 +804,7 @@ export class YKColorPicker {
     }
     let _container: HTMLElement | null = null;
     if (typeof this._options.container == "string") {
-      _container = document.getElementById(this._options.container);
+      _container = document.querySelector(this._options.container);
     } else {
       _container = this._options.container;
     }
@@ -1375,8 +1398,6 @@ export class YKColorPicker {
 
             case YKColorPickerMode.HSL:
               {
-                console.log(this._color.hsv.s);
-
                 const { h, s, l } = this._color.getHSL();
                 let hsl_s = s;
                 if (hsl_s < 100) {
@@ -1878,8 +1899,6 @@ export class YKColorPicker {
     if (key == "Escape") {
       if (this._prevColor != this.getHEX()) {
         this.setColor(this._prevColor);
-        this._updateGUI();
-        this._options.onInput(this);
       }
       this.close();
     }
@@ -1888,15 +1907,17 @@ export class YKColorPicker {
   private _onResizeScrollWindow(event: Event) {
     const { type } = event;
     const { target, closeOnScroll, closeOnResize } = this._options;
+
+    if (target == null) {
+      return;
+    }
+
     if (
       (type == "scroll" && closeOnScroll) ||
       (type == "resize" && closeOnResize)
     ) {
       this.close();
     } else {
-      if (target == null) {
-        return;
-      }
       if (!YKColorPicker._isTargetInViewport(target)) {
         this.close();
         return;
