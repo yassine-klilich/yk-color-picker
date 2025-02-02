@@ -31,7 +31,7 @@
   "bugs": {
     "url": "https://github.com/yassine-klilich/yk-color-picker/issues"
   },
-  "homepage": "https://github.com/yassine-klilich/yk-color-picker#readme",
+  "homepage": "https://yassine-klilich.github.io/yk-color-picker/",
   "devDependencies": {
     "rollup-plugin-cleandir": "^3.0.0",
     "rollup-plugin-dts": "^6.1.1",
