@@ -29,6 +29,8 @@ export declare class YKColorPicker {
     private _prevColor;
     private _targetKeydownOpen;
     constructor(options: YKColorPickerOptions);
+    get options(): YKColorPickerOptions;
+    get target(): HTMLElement | null;
     isOpen(): boolean;
     open(): void;
     close(): void;
@@ -155,6 +157,8 @@ export declare class YKColorPicker {
     private _getPositionAxis;
     private _setPositionAxis;
     private _updateRepresentation;
+    private _updateTheme;
+    private _updateTarget;
     private static _isTargetInViewport;
     private static _getPageHeight;
     private static _getPageWidth;
@@ -174,7 +178,7 @@ export declare enum YKColorPickerMode {
 }
 
 export declare interface YKColorPickerOptions {
-    target?: HTMLElement | null;
+    target?: HTMLElement | string | null;
     container?: HTMLElement | string | null;
     position?: YKColorPickerPosition;
     positionFallback?: YKColorPickerPositionFallback;
@@ -190,6 +194,7 @@ export declare interface YKColorPickerOptions {
     onChange?: (instance: YKColorPicker) => void;
     onCopy?: (instance: YKColorPicker) => void;
     onRepresentationChange?: (instance: YKColorPicker) => void;
+    onTargetChange?: (instance: YKColorPicker, previousTarget: HTMLElement | null) => void;
     onContainerChange?: (instance: YKColorPicker, previousParent: HTMLElement) => void;
 }
 

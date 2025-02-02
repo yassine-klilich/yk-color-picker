@@ -1,20 +1,20 @@
 function w(n) {
   return n.toString(16).padStart(2, "0");
 }
-function u(n, e, t) {
+function c(n, t, e) {
   const o = document.createElement(n);
-  if (e != null && o.classList.add(...e), t)
-    for (const i in t)
-      Object.prototype.hasOwnProperty.call(t, i) && o.setAttribute(i, t[i]);
+  if (t != null && o.classList.add(...t), e)
+    for (const i in e)
+      Object.prototype.hasOwnProperty.call(e, i) && o.setAttribute(i, e[i]);
   return o;
 }
-function l(n, e, t) {
-  n.addEventListener(e, t);
+function l(n, t, e) {
+  n.addEventListener(t, e);
 }
-function d(n, e, t) {
-  return Math.min(Math.max(Math.round(n), e), t);
+function p(n, t, e) {
+  return Math.min(Math.max(Math.round(n), t), e);
 }
-const p = {
+const d = {
   parse: function(n) {
     if (n == null)
       throw new Error("YKColorParser:: color is undefined");
@@ -23,19 +23,19 @@ const p = {
         return this.compileRGB(n);
       if (/^(#)/i.test(n))
         return this.compileHEX(n);
-      let e = this.getNamedColor(n.toLowerCase());
-      if (e != null) {
-        const t = e.split(" "), { h: o, s: i, v: s } = p.RGBtoHSV(
-          parseInt(t[0]),
-          parseInt(t[1]),
-          parseInt(t[2])
+      let t = this.getNamedColor(n.toLowerCase());
+      if (t != null) {
+        const e = t.split(" "), { h: o, s: i, v: s } = d.RGBtoHSV(
+          parseInt(e[0]),
+          parseInt(e[1]),
+          parseInt(e[2])
         );
         return { h: o, s: i, v: s, a: 1 };
       }
     } else {
-      const { r: e, g: t, b: o, a: i } = n;
-      if (e >= 0 && e <= 255 && t >= 0 && t <= 255 && o >= 0 && o <= 255 && i >= 0 && i <= 1) {
-        const { h: s, s: r, v: h } = p.RGBtoHSV(e, t, o);
+      const { r: t, g: e, b: o, a: i } = n;
+      if (t >= 0 && t <= 255 && e >= 0 && e <= 255 && o >= 0 && o <= 255 && i >= 0 && i <= 1) {
+        const { h: s, s: r, v: h } = d.RGBtoHSV(t, e, o);
         return { h: s, s: r, v: h, a: i };
       }
       throw new Error(
@@ -47,123 +47,123 @@ const p = {
     );
   },
   compileRGB: function(n) {
-    let e, t, o, i;
+    let t, e, o, i;
     const s = /rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)\s*(\s+(0?(\.\d+)?|1(\.0*)?)\s*)?\)/i;
     if (s.test(n)) {
       const r = n.split(s).filter((g) => !isNaN(parseInt(g)) && g != "" && g != null);
-      if (e = parseInt(r[0]), t = parseInt(r[1]), o = parseInt(r[2]), i = parseFloat(r[3]), e > 255)
+      if (t = parseInt(r[0]), e = parseInt(r[1]), o = parseInt(r[2]), i = parseFloat(r[3]), t > 255)
         throw new RangeError(
-          `YKColorParser:: '${n}' --> ${e} has an invalid red color, it must be an interger between 0 and 255`
+          `YKColorParser:: '${n}' --> ${t} has an invalid red color, it must be an interger between 0 and 255`
         );
-      if (t > 255)
+      if (e > 255)
         throw new RangeError(
-          `YKColorParser:: '${n}' --> ${t} has an invalid green color, it must be an interger between 0 and 255`
+          `YKColorParser:: '${n}' --> ${e} has an invalid green color, it must be an interger between 0 and 255`
         );
       if (o > 255)
         throw new RangeError(
           `YKColorParser:: '${n}' --> ${o} has an invalid blue color, it must be an interger between 0 and 255`
         );
-      const { h, s: c, v: _ } = p.RGBtoHSV(e, t, o);
-      return { h, s: c, v: _, a: isNaN(i) ? 1 : i };
+      const { h, s: u, v: _ } = d.RGBtoHSV(t, e, o);
+      return { h, s: u, v: _, a: isNaN(i) ? 1 : i };
     }
     throw new SyntaxError(
       `YKColorParser:: '${n}' is an invalid RGB format`
     );
   },
   compileHEX: function(n) {
-    const e = p.HEXtoRGBA(n);
-    if (e) {
-      const { r: t, g: o, b: i, a: s } = e, { h: r, s: h, v: c } = p.RGBtoHSV(t, o, i);
-      return { h: r, s: h, v: c, a: s };
+    const t = d.HEXtoRGBA(n);
+    if (t) {
+      const { r: e, g: o, b: i, a: s } = t, { h: r, s: h, v: u } = d.RGBtoHSV(e, o, i);
+      return { h: r, s: h, v: u, a: s };
     }
     throw new Error(`YKColorParser:: '${n}' is an invalid HEX format`);
   },
-  RGBtoHSV: function(n, e, t) {
-    n /= 255, e /= 255, t /= 255;
-    let o = Math.max(n, e, t), i = Math.min(n, e, t), s = 0, r = 0, h = o, c = o - i;
-    if (r = o == 0 ? 0 : c / o, o == i)
+  RGBtoHSV: function(n, t, e) {
+    n /= 255, t /= 255, e /= 255;
+    let o = Math.max(n, t, e), i = Math.min(n, t, e), s = 0, r = 0, h = o, u = o - i;
+    if (r = o == 0 ? 0 : u / o, o == i)
       s = 0;
     else {
       switch (o) {
         case n:
-          s = (e - t) / c + (e < t ? 6 : 0);
-          break;
-        case e:
-          s = (t - n) / c + 2;
+          s = (t - e) / u + (t < e ? 6 : 0);
           break;
         case t:
-          s = (n - e) / c + 4;
+          s = (e - n) / u + 2;
+          break;
+        case e:
+          s = (n - t) / u + 4;
           break;
       }
       s /= 6;
     }
     return s = s * 360, r = r * 100, h = h * 100, { h: s, s: r, v: h };
   },
-  HSLtoHSV: function(n, e, t) {
-    e /= 100, t /= 100;
-    let o = t + e * Math.min(t, 1 - t), i = o == 0 ? 0 : 2 * (1 - t / o);
+  HSLtoHSV: function(n, t, e) {
+    t /= 100, e /= 100;
+    let o = e + t * Math.min(e, 1 - e), i = o == 0 ? 0 : 2 * (1 - e / o);
     return {
       h: n,
-      s: d(i * 100, 0, 100),
-      v: d(o * 100, 0, 100)
+      s: p(i * 100, 0, 100),
+      v: p(o * 100, 0, 100)
     };
   },
-  HSVtoHSL: function(n, e, t) {
-    e /= 100, t /= 100;
-    let o = (2 - e) * t / 2, i = o !== 0 && o !== 1 ? e * t / (o < 0.5 ? o * 2 : 2 - o * 2) : 0;
+  HSVtoHSL: function(n, t, e) {
+    t /= 100, e /= 100;
+    let o = (2 - t) * e / 2, i = o !== 0 && o !== 1 ? t * e / (o < 0.5 ? o * 2 : 2 - o * 2) : 0;
     return {
-      h: d(n, 0, 360),
-      s: d(i * 100, 0, 100),
-      l: d(o * 100, 0, 100)
+      h: p(n, 0, 360),
+      s: p(i * 100, 0, 100),
+      l: p(o * 100, 0, 100)
     };
   },
   HEXtoRGBA: function(n) {
-    let e = 0, t = 0, o = 0, i = 0;
+    let t = 0, e = 0, o = 0, i = 0;
     if (/^#(([a-f0-9]){3,4}|([a-f0-9]){6}|([a-f0-9]){8})$/i.test(n)) {
       if (n.length < 6) {
         const s = n.split("");
-        e = +("0x" + s[1] + s[1]), t = +("0x" + s[2] + s[2]), o = +("0x" + s[3] + s[3]), i = s[4] ? parseFloat(
+        t = +("0x" + s[1] + s[1]), e = +("0x" + s[2] + s[2]), o = +("0x" + s[3] + s[3]), i = s[4] ? parseFloat(
           (+("0x" + s[4] + s[4]) / 255).toFixed(2)
         ) : 1;
       } else if (n.length < 10) {
         const s = n.split(/([a-f0-9]{2})/i);
-        e = +("0x" + s[1]), t = +("0x" + s[3]), o = +("0x" + s[5]), i = s[7] ? parseFloat((+("0x" + s[7]) / 255).toFixed(2)) : 1;
+        t = +("0x" + s[1]), e = +("0x" + s[3]), o = +("0x" + s[5]), i = s[7] ? parseFloat((+("0x" + s[7]) / 255).toFixed(2)) : 1;
       }
-      return { r: e, g: t, b: o, a: i };
+      return { r: t, g: e, b: o, a: i };
     }
   },
-  RGBAtoHEX: function(n, e, t, o) {
-    return `#${w(d(n, 0, 255))}${w(
-      d(e, 0, 255)
-    )}${w(d(t, 0, 255))}${o == 1 ? "" : w(d(o, 0, 1) * 255)}`;
+  RGBAtoHEX: function(n, t, e, o) {
+    return `#${w(p(n, 0, 255))}${w(
+      p(t, 0, 255)
+    )}${w(p(e, 0, 255))}${o < 1 ? w(Math.round(o * 255)) : ""}`;
   },
-  HSVtoRGB: function(n, e, t) {
-    n /= 360, e /= 100, t /= 100;
-    let o = 0, i = 0, s = 0, r, h, c, _, g;
-    switch (r = Math.floor(n * 6), h = n * 6 - r, c = t * (1 - e), _ = t * (1 - h * e), g = t * (1 - (1 - h) * e), r % 6) {
+  HSVtoRGB: function(n, t, e) {
+    n /= 360, t /= 100, e /= 100;
+    let o = 0, i = 0, s = 0, r, h, u, _, g;
+    switch (r = Math.floor(n * 6), h = n * 6 - r, u = e * (1 - t), _ = e * (1 - h * t), g = e * (1 - (1 - h) * t), r % 6) {
       case 0:
-        o = t, i = g, s = c;
+        o = e, i = g, s = u;
         break;
       case 1:
-        o = _, i = t, s = c;
+        o = _, i = e, s = u;
         break;
       case 2:
-        o = c, i = t, s = g;
+        o = u, i = e, s = g;
         break;
       case 3:
-        o = c, i = _, s = t;
+        o = u, i = _, s = e;
         break;
       case 4:
-        o = g, i = c, s = t;
+        o = g, i = u, s = e;
         break;
       case 5:
-        o = t, i = c, s = _;
+        o = e, i = u, s = _;
         break;
     }
     return {
-      r: d(o * 255, 0, 255),
-      g: d(i * 255, 0, 255),
-      b: d(s * 255, 0, 255)
+      r: p(o * 255, 0, 255),
+      g: p(i * 255, 0, 255),
+      b: p(s * 255, 0, 255)
     };
   },
   getNamedColor: function(n) {
@@ -318,59 +318,74 @@ const p = {
     }[n];
   }
 };
-class I {
-  constructor(e, t, o, i) {
-    this.a = i, this.hsv = { h: e, s: t, v: o }, this.rgb = this.toRGB(), this.hsl = this.toHSL(), this.hex = this.toHEX();
+class T {
+  constructor(t, e, o, i) {
+    this.a = i, this.hsv = { h: t, s: e, v: o }, this.rgb = this.toRGB(), this.hsl = this.toHSL(), this.hex = this.toHEX();
   }
   getRGB() {
     return {
-      r: d(this.rgb.r, 0, 255),
-      g: d(this.rgb.g, 0, 255),
-      b: d(this.rgb.b, 0, 255)
+      r: p(this.rgb.r, 0, 255),
+      g: p(this.rgb.g, 0, 255),
+      b: p(this.rgb.b, 0, 255)
     };
   }
   getHSV() {
     return {
-      h: d(this.hsv.h, 0, 360),
-      s: d(this.hsv.s, 0, 100),
-      v: d(this.hsv.v, 0, 100)
+      h: p(this.hsv.h, 0, 360),
+      s: p(this.hsv.s, 0, 100),
+      v: p(this.hsv.v, 0, 100)
     };
   }
   getHSL() {
     return {
-      h: d(this.hsl.h, 0, 360),
-      s: d(this.hsl.s, 0, 100),
-      l: d(this.hsl.l, 0, 100)
+      h: p(this.hsl.h, 0, 360),
+      s: p(this.hsl.s, 0, 100),
+      l: p(this.hsl.l, 0, 100)
     };
   }
   toRGB() {
-    let { h: e, s: t, v: o } = this.hsv;
-    return p.HSVtoRGB(e, t, o);
+    let { h: t, s: e, v: o } = this.hsv;
+    return d.HSVtoRGB(t, e, o);
   }
   toHSL() {
-    let { h: e, s: t, v: o } = this.hsv;
-    return p.HSVtoHSL(e, t, o);
+    let { h: t, s: e, v: o } = this.hsv;
+    return d.HSVtoHSL(t, e, o);
   }
   toHEX() {
-    let { r: e, g: t, b: o } = this.toRGB();
-    return p.RGBAtoHEX(e, t, o, this.a);
+    let { r: t, g: e, b: o } = this.toRGB();
+    return d.RGBAtoHEX(t, e, o, this.a);
   }
 }
 var M = /* @__PURE__ */ ((n) => (n.TOP = "t", n.BOTTOM = "b", n.LEFT = "l", n.RIGHT = "r", n))(M || {}), A = /* @__PURE__ */ ((n) => (n.RGB = "rgb", n.HSV = "hsv", n.HSL = "hsl", n.HEX = "hex", n))(A || {});
 const a = class a {
-  constructor(e) {
-    this._isOpen = !1, this._options = a.DEFAULT_OPTIONS, this._color = new I(0, 0, 0, 1), this._dom = {}, this._copyTimeout = null, this._prevColor = null, this._targetKeydownOpen = !1, this._options = a._buildOptions(
+  constructor(t) {
+    this._isOpen = !1, this._options = a.DEFAULT_OPTIONS, this._color = new T(0, 0, 0, 1), this._dom = {}, this._copyTimeout = null, this._prevColor = null, this._targetKeydownOpen = !1, this._options = a._buildOptions(
       a.DEFAULT_OPTIONS,
-      e
+      t
     );
-    const { target: t, representation: o } = this._options;
-    this._dom.target = t, this._currentRepresentation = o, t && (this._onClickTargetBind = this._onClickTarget.bind(this), l(t, "click", this._onClickTargetBind)), this.setColor(this._options.color), this._prevColor = this.getHEX(), this._initDOM();
+    const { target: e, representation: o } = this._options;
+    let i = null;
+    if (typeof e == "string")
+      i = document.querySelector(e);
+    else if (e && e.nodeType == Node.ELEMENT_NODE)
+      i = e;
+    else if (e != null)
+      throw new Error(
+        "YKColorPicker:: target must be a string or an HTMLElement"
+      );
+    this._dom.target = i, this._currentRepresentation = o, i && (this._onClickTargetBind = this._onClickTarget.bind(this), l(i, "click", this._onClickTargetBind)), this._initDOM(), this.setColor(this._options.color);
+  }
+  get options() {
+    return this._options;
+  }
+  get target() {
+    return this._dom.target;
   }
   isOpen() {
     return this._isOpen;
   }
   open() {
-    this._prevColor = this.getHEX(), this._options.container ? this._attachToContainer(!0) : this._attachToBody(), this._dom.cursor.focus(), this._options.onOpen && this._options.onOpen(this);
+    this._isOpen = !0, this._prevColor = this.getHEX(), this._options.container ? this._attachToContainer(!0) : this._attachToBody(), this._dom.overlayWrapper.classList.add("yk-overlay-wrapper--open"), this._dom.cursor.focus(), this._options.onOpen && this._options.onOpen(this);
   }
   close() {
     this._dc || (this._prevColor != this.getHEX() && this._options.onChange && this._options.onChange(this), this._detachOverlay(), this._options.onClose && this._options.onClose(this)), this._dc = !1;
@@ -379,19 +394,19 @@ const a = class a {
     return { ...this._color.toRGB(), a: this._color.a };
   }
   getHSV() {
-    const { h: e, s: t, v: o } = this._color.getHSV();
+    const { h: t, s: e, v: o } = this._color.getHSV();
     return {
-      h: e,
-      s: t,
+      h: t,
+      s: e,
       v: o,
       a: this._color.a
     };
   }
   getHSL() {
-    const { h: e, s: t, l: o } = this._color.toHSL();
+    const { h: t, s: e, l: o } = this._color.toHSL();
     return {
-      h: e,
-      s: t,
+      h: t,
+      s: e,
       l: o,
       a: this._color.a
     };
@@ -399,37 +414,35 @@ const a = class a {
   getHEX() {
     return this._color.toHEX();
   }
-  updateOptions(e) {
-    const t = a._buildOptions(this._options, e);
-    this._options = t;
-    const { target: o, representation: i } = this._options;
-    i && this._currentRepresentation != i && this._updateRepresentation(i), this._dom.target != o && (this._dom.target != null && this._dom.target.removeEventListener("click", this._onClickTargetBind), this._dom.target = o, this._dom.target != null && this._dom.attachEvent(o, "click", this._onClickTargetBind)), this._isOpen && (this._options.container ? this._attachToContainer(!0) : this._attachToBody());
+  updateOptions(t) {
+    const e = a._buildOptions(this._options, t);
+    this._options = e, t.hasOwnProperty("theme") && this._updateTheme(e.theme), t.hasOwnProperty("representation") && this._updateRepresentation(e.representation), t.hasOwnProperty("position") && t.hasOwnProperty("container") == !1 && this._updatePosition(), t.hasOwnProperty("container") && (t.container ? this._attachToContainer(!0) : this._attachToBody()), t.hasOwnProperty("target") && this._updateTarget(t.target), t.hasOwnProperty("color") && t.color && this.setColor(t.color);
   }
   getColor() {
     switch (this._currentRepresentation) {
       case "rgb": {
-        const { r: e, g: t, b: o } = this._color.getRGB();
+        const { r: t, g: e, b: o } = this._color.getRGB();
         return {
-          r: e,
-          g: t,
+          r: t,
+          g: e,
           b: o,
           a: this._color.a
         };
       }
       case "hsv": {
-        const { h: e, s: t, v: o } = this._color.getHSV();
+        const { h: t, s: e, v: o } = this._color.getHSV();
         return {
-          h: e,
-          s: t,
+          h: t,
+          s: e,
           v: o,
           a: this._color.a
         };
       }
       case "hsl": {
-        const { h: e, s: t, l: o } = this._color.getHSL();
+        const { h: t, s: e, l: o } = this._color.getHSL();
         return {
-          h: e,
-          s: t,
+          h: t,
+          s: e,
           l: o,
           a: this._color.a
         };
@@ -438,73 +451,89 @@ const a = class a {
         return this.getHEX();
     }
   }
-  setColor(e) {
-    const { h: t, s: o, v: i, a: s } = p.parse(e);
-    this._color = new I(t, o, i, s);
+  setColor(t) {
+    const { h: e, s: o, v: i, a: s } = d.parse(t);
+    this._color = new T(e, o, i, s), this._updateGUI(), this._options.onInput(this);
   }
   _initDOM() {
-    const e = u("div", ["yk-overlay-wrapper"]), t = u("div", ["yk-wrapper"]);
-    e.appendChild(t), t.appendChild(this._buildPaletteColor()), t.appendChild(this._buildColorSettings()), l(
-      e,
+    const t = c("div", ["yk-overlay-wrapper"]), e = c("div", ["yk-wrapper"]);
+    t.appendChild(e), e.appendChild(this._buildPaletteColor()), e.appendChild(this._buildColorSettings()), l(
+      t,
       "click",
       (o) => o.stopPropagation()
-    ), this._dom.overlayWrapper = e, this._onKeyUpCloseBind = this._onKeyUpClose.bind(this), this._onResizeScrollWindowBind = this._onResizeScrollWindow.bind(this), this._onClickCloseBind = this.close.bind(this), this._options.container ? this._attachToContainer(!1) : document.body.appendChild(this._dom.overlayWrapper), this._options.onInit && this._options.onInit(this);
+    ), this._dom.overlayWrapper = t, this._onKeyUpCloseBind = this._onKeyUpClose.bind(this), this._onResizeScrollWindowBind = this._onResizeScrollWindow.bind(this), this._onClickCloseBind = this.close.bind(this), this._options.container ? this._attachToContainer(!1) : document.body.appendChild(this._dom.overlayWrapper), this._options.onInit && this._options.onInit(this);
   }
   _updateGUI() {
     this._updateCursorThumb(), this._updateInputs(), this._updateColorPreview(!1), this._updateHueThumb(), this._updateOpacityThumb();
   }
   _buildPaletteColor() {
-    const e = u("div", ["yk-palette-wrapper"]), t = u("div", ["yk-palette"]), o = u("a", ["yk-cursor"], { tabindex: 0 });
-    return e.appendChild(t), e.appendChild(o), this._onMouseDownCursorBind = this._onMouseDownCursor.bind(this), this._onMouseUpCursorBind = this._onMouseUpCursor.bind(this), this._onMouseMoveCursorBind = this._onMouseMoveCursor.bind(this), l(e, "pointerdown", this._onMouseDownCursorBind), l(o, "keydown", this._onKeydownCursor.bind(this)), this._dom.palette = t, this._dom.cursor = o, e;
+    const t = c("div", ["yk-palette-wrapper"]), e = c("div", ["yk-palette"]), o = c("a", ["yk-cursor"], { tabindex: 0 });
+    return t.appendChild(e), t.appendChild(o), this._onMouseDownCursorBind = this._onMouseDownCursor.bind(this), this._onMouseUpCursorBind = this._onMouseUpCursor.bind(this), this._onMouseMoveCursorBind = this._onMouseMoveCursor.bind(this), l(t, "pointerdown", this._onMouseDownCursorBind), l(o, "keydown", this._onKeydownCursor.bind(this)), this._dom.palette = e, this._dom.cursor = o, t;
   }
   _buildColorSettings() {
-    const e = u("div", ["yk-color-settings"]);
-    return e.appendChild(this._buildCopyColor()), e.appendChild(this._buildColorPreview()), e.appendChild(this._buildColorSliders()), e.appendChild(this._buildColorInputs()), e;
+    const t = c("div", ["yk-color-settings"]);
+    return t.appendChild(this._buildCopyColor()), t.appendChild(this._buildColorPreview()), t.appendChild(this._buildColorSliders()), t.appendChild(this._buildColorInputs()), t;
   }
   _buildColorInputs() {
-    const e = u("div", ["yk-color-model-wrapper"]), t = u("div", ["yk-color-model"]), o = u("button", ["yk-color-model-switch"], {
+    const t = c("div", ["yk-color-model-wrapper"]), e = c("div", ["yk-color-model"]), o = c("button", ["yk-color-model-switch"], {
       type: "button"
     });
     return o.appendChild(
       this._createSVGIcon(
         '<path d="m3.5045 11.431 1.5786-1.5786 3.0256 3.0256 3.0256-3.0256 1.5786 1.5786-4.6042 4.4726zm4.6042-11.313 4.6042 4.4726-1.5786 1.5786-3.0256-3.0256-3.0256 3.0256-1.5786-1.5786z"/>'
       )
-    ), e.appendChild(t), e.appendChild(o), l(o, "click", this._onClickInputsSwitch.bind(this)), this._dom.btnSwitch = o, this._dom.inputsWrapper = t, e;
+    ), t.appendChild(e), t.appendChild(o), l(o, "click", this._onClickInputsSwitch.bind(this)), this._dom.btnSwitch = o, this._dom.inputsWrapper = e, t;
   }
   _buildInput() {
-    const { inputsWrapper: e } = this._dom;
-    e.innerHTML = "", this._currentRepresentation == "hex" ? e.appendChild(this._buildHEXInput()) : e.appendChild(this._buildQuadrupedInput());
+    const { inputsWrapper: t } = this._dom;
+    t.innerHTML = "", this._currentRepresentation == "hex" ? t.appendChild(this._buildHEXInput()) : t.appendChild(this._buildQuadrupedInput());
   }
   _buildHEXInput() {
-    const e = u("div", ["yk-hex-input"]), t = u("input", ["yk-color-input"]), o = u("label", ["yk-color-model-label"]);
-    return t.setAttribute("type", "text"), o.textContent = "HEX", e.appendChild(t), e.appendChild(o), l(t, "focus", this._onFocusInput.bind(this)), l(t, "keydown", this._onKeyDownInputHEX.bind(this)), l(t, "input", this._onInputHEX.bind(this)), l(t, "change", this._onChangeInputHEX.bind(this)), this._dom.inputHEX = t, e;
+    const t = c("div", ["yk-hex-input"]), e = c("input", ["yk-color-input"], {
+      id: "yk-color-input-hex"
+    }), o = c("label", ["yk-color-model-label"], {
+      for: "yk-color-input-hex"
+    });
+    return e.setAttribute("type", "text"), o.textContent = "HEX", t.appendChild(e), t.appendChild(o), l(e, "focus", this._onFocusInput.bind(this)), l(e, "keydown", this._onKeyDownInputHEX.bind(this)), l(e, "input", this._onInputHEX.bind(this)), l(e, "change", this._onChangeInputHEX.bind(this)), this._dom.inputHEX = e, t;
   }
   _buildQuadrupedInput() {
-    const e = u("div", ["yk-input-wrapper"]), t = u("input", ["yk-color-input"], {
+    const t = c("div", ["yk-input-wrapper"]), e = c("input", ["yk-color-input"], {
       type: "text",
-      inputmode: "numeric"
-    }), o = u("input", ["yk-color-input"], {
+      inputmode: "numeric",
+      id: "yk-color-input-1"
+    }), o = c("input", ["yk-color-input"], {
       type: "text",
-      inputmode: "numeric"
-    }), i = u("input", ["yk-color-input"], {
+      inputmode: "numeric",
+      id: "yk-color-input-2"
+    }), i = c("input", ["yk-color-input"], {
       type: "text",
-      inputmode: "numeric"
-    }), s = u("input", ["yk-color-input"], {
+      inputmode: "numeric",
+      id: "yk-color-input-3"
+    }), s = c("input", ["yk-color-input"], {
       type: "text",
-      inputmode: "numeric"
-    }), r = u("label", ["yk-color-model-label"]), h = u("label", ["yk-color-model-label"]), c = u("label", ["yk-color-model-label"]), _ = u("label", ["yk-color-model-label"]), g = this._currentRepresentation.toUpperCase();
-    return r.textContent = g[0], h.textContent = g[1], c.textContent = g[2], _.textContent = "A", e.appendChild(t), e.appendChild(o), e.appendChild(i), e.appendChild(s), e.appendChild(r), e.appendChild(h), e.appendChild(c), e.appendChild(_), l(t, "focus", this._onFocusInput.bind(this)), l(t, "keydown", this._onKeyDownInputA.bind(this)), l(t, "input", this._onInputA.bind(this)), l(t, "change", this._onChangeInputA.bind(this)), l(o, "focus", this._onFocusInput.bind(this)), l(o, "keydown", this._onKeyDownInputB.bind(this)), l(o, "input", this._onInputB.bind(this)), l(o, "change", this._onChangeInputB.bind(this)), l(i, "focus", this._onFocusInput.bind(this)), l(i, "keydown", this._onKeyDownInputC.bind(this)), l(i, "input", this._onInputC.bind(this)), l(i, "change", this._onChangeInputC.bind(this)), l(s, "keydown", this._onKeyDownAlphaInput.bind(this)), l(s, "input", this._onKeyUpAlphaInput.bind(this)), l(s, "change", this._onChangeAlphaInput.bind(this)), this._dom.inputA = t, this._dom.inputB = o, this._dom.inputC = i, this._dom.inputAlpha = s, e;
+      inputmode: "numeric",
+      id: "yk-color-input-4"
+    }), r = c("label", ["yk-color-model-label"], {
+      for: "yk-color-input-1"
+    }), h = c("label", ["yk-color-model-label"], {
+      for: "yk-color-input-2"
+    }), u = c("label", ["yk-color-model-label"], {
+      for: "yk-color-input-3"
+    }), _ = c("label", ["yk-color-model-label"], {
+      for: "yk-color-input-4"
+    }), g = this._currentRepresentation.toUpperCase();
+    return r.textContent = g[0], h.textContent = g[1], u.textContent = g[2], _.textContent = "A", t.appendChild(e), t.appendChild(o), t.appendChild(i), t.appendChild(s), t.appendChild(r), t.appendChild(h), t.appendChild(u), t.appendChild(_), l(e, "focus", this._onFocusInput.bind(this)), l(e, "keydown", this._onKeyDownInputA.bind(this)), l(e, "input", this._onInputA.bind(this)), l(e, "change", this._onChangeInputA.bind(this)), l(o, "focus", this._onFocusInput.bind(this)), l(o, "keydown", this._onKeyDownInputB.bind(this)), l(o, "input", this._onInputB.bind(this)), l(o, "change", this._onChangeInputB.bind(this)), l(i, "focus", this._onFocusInput.bind(this)), l(i, "keydown", this._onKeyDownInputC.bind(this)), l(i, "input", this._onInputC.bind(this)), l(i, "change", this._onChangeInputC.bind(this)), l(s, "keydown", this._onKeyDownAlphaInput.bind(this)), l(s, "input", this._onKeyUpAlphaInput.bind(this)), l(s, "change", this._onChangeAlphaInput.bind(this)), this._dom.inputA = e, this._dom.inputB = o, this._dom.inputC = i, this._dom.inputAlpha = s, t;
   }
   _updateOpacityThumb() {
-    const { opacitySlider: e, opacityThumb: t } = this._dom;
-    t.style.translate = `${this._color.a * e.offsetWidth}px`;
+    const { opacitySlider: t, opacityThumb: e } = this._dom;
+    e.style.translate = `${this._color.a * t.offsetWidth}px`;
   }
   _updateHueThumb() {
-    const { hueThumb: e, hueSlider: t } = this._dom;
-    e.style.translate = `${this._color.hsv.h / 360 * t.offsetWidth}px`;
+    const { hueThumb: t, hueSlider: e } = this._dom;
+    t.style.translate = `${this._color.hsv.h / 360 * e.offsetWidth}px`;
   }
-  _setQuadrupedValue(e, t, o) {
-    this._dom.inputA.value = e, this._dom.inputB.value = t, this._dom.inputC.value = o, this._dom.inputAlpha.value = parseFloat(this._color.a.toFixed(2));
+  _setQuadrupedValue(t, e, o) {
+    this._dom.inputA.value = t, this._dom.inputB.value = e, this._dom.inputC.value = o, this._dom.inputAlpha.value = parseFloat(this._color.a.toFixed(2));
   }
   _updateHEXInput() {
     this._dom.inputHEX.value = this._color.hex;
@@ -519,20 +548,20 @@ const a = class a {
     switch (this._currentRepresentation) {
       case "rgb":
         {
-          const { r: e, g: t, b: o } = this._color.rgb = this._color.toRGB();
-          this._setQuadrupedValue(e, t, o);
+          const { r: t, g: e, b: o } = this._color.rgb = this._color.toRGB();
+          this._setQuadrupedValue(t, e, o);
         }
         break;
       case "hsv":
         {
-          const { h: e, s: t, v: o } = this._color.getHSV();
-          this._setQuadrupedValue(`${e}°`, `${t}%`, `${o}%`);
+          const { h: t, s: e, v: o } = this._color.getHSV();
+          this._setQuadrupedValue(`${t}°`, `${e}%`, `${o}%`);
         }
         break;
       case "hsl":
         {
-          const { h: e, s: t, l: o } = this._color.hsl = this._color.toHSL();
-          this._setQuadrupedValue(`${e}°`, `${t}%`, `${o}%`);
+          const { h: t, s: e, l: o } = this._color.hsl = this._color.toHSL();
+          this._setQuadrupedValue(`${t}°`, `${e}%`, `${o}%`);
         }
         break;
       case "hex":
@@ -540,177 +569,168 @@ const a = class a {
         break;
     }
   }
-  _updateColorPreview(e) {
-    const t = this._color.a, o = this._color.toHSL(), { palette: i, opacitySlider: s, colorPreview: r } = this._dom, h = `hsl(${o.h}deg 100% 50% / 1)`;
+  _updateColorPreview(t) {
+    const e = this._color.a, o = this._color.toHSL(), { palette: i, opacitySlider: s, colorPreview: r } = this._dom, h = `hsl(${o.h}deg 100% 50% / 1)`;
     i.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${h} 100%)`;
-    const c = `hsl(${o.h}, ${o.s}%, ${o.l}%)`;
+    const u = `hsl(${o.h}, ${o.s}%, ${o.l}%)`;
     s.style.setProperty(
       "background-image",
-      `linear-gradient(90deg, transparent, ${c})`
-    ), r.setAttribute("fill", c), r.setAttribute("fill-opacity", t), e == !0 && this._options.onInput(this);
+      `linear-gradient(90deg, transparent, ${u})`
+    ), r.setAttribute("fill", u), r.setAttribute("fill-opacity", e), t == !0 && this._options.onInput(this);
   }
   _updateCursorThumb() {
-    const { palette: e, cursor: t } = this._dom, { s: o, v: i } = this._color.getHSV();
-    t.style.translate = `${o / 100 * e.offsetWidth}px ${e.offsetHeight - i / 100 * e.offsetHeight}px`;
+    const { palette: t, cursor: e } = this._dom, { s: o, v: i } = this._color.getHSV();
+    e.style.translate = `${o / 100 * t.offsetWidth}px ${t.offsetHeight - i / 100 * t.offsetHeight}px`;
   }
   _buildCopyColor() {
-    const e = u("button", ["yk-clipboard-color"], {
+    const t = c("button", ["yk-clipboard-color"], {
       type: "button"
     });
-    return l(e, "click", this._onClickCopyColor.bind(this)), this._dom.copyColor = e, this._attachCopyIcon(), e;
+    return l(t, "click", this._onClickCopyColor.bind(this)), this._dom.copyColor = t, this._attachCopyIcon(), t;
   }
   _attachCopyIcon() {
-    const e = '<path d="m1.9695 11.037v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c0.8 0 1.5 0.5 1.7 1.2h-5.6c-1.6 0.1-2.9 1.4-2.9 3.1v7.9c-0.7-0.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-0.8-1.8-1.8v-8.6c0-1 0.8-1.8 1.8-1.8h6.1c1 0 1.8 0.8 1.8 1.8v8.6c0 1-0.8 1.8-1.8 1.8zm6.7-1.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3 0-0.6 0.3-0.6 0.6v8.6c0 0.3 0.3 0.6 0.6 0.6h6.1c0.3 0 0.6-0.3 0.6-0.6z"/>';
-    this._dom.copyColor.innerHTML = "", this._dom.copyColor.appendChild(this._createSVGIcon(e));
+    const t = '<path d="m1.9695 11.037v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c0.8 0 1.5 0.5 1.7 1.2h-5.6c-1.6 0.1-2.9 1.4-2.9 3.1v7.9c-0.7-0.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-0.8-1.8-1.8v-8.6c0-1 0.8-1.8 1.8-1.8h6.1c1 0 1.8 0.8 1.8 1.8v8.6c0 1-0.8 1.8-1.8 1.8zm6.7-1.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3 0-0.6 0.3-0.6 0.6v8.6c0 0.3 0.3 0.6 0.6 0.6h6.1c0.3 0 0.6-0.3 0.6-0.6z"/>';
+    this._dom.copyColor.innerHTML = "", this._dom.copyColor.appendChild(this._createSVGIcon(t));
   }
   _attachCheckIcon() {
-    const e = '<path d="m13.975 5.3001c0.24929-0.24929 0.16619-0.58168-0.0831-0.83097l-0.66477-0.66477c-0.24929-0.24929-0.58168-0.16619-0.83097 0.083097l-5.5675 6.2322-3.407-3.1577c-0.24929-0.24929-0.58168-0.16619-0.83097 0.083097l-0.66477 0.66477c-0.24929 0.24929-0.16619 0.58168 0.083097 0.83097l4.5703 4.1548c0.24929 0.24929 0.58168 0.16619 0.83097-0.0831z"/>';
-    this._dom.copyColor.innerHTML = "", this._dom.copyColor.appendChild(this._createSVGIcon(e));
+    const t = '<path d="m13.975 5.3001c0.24929-0.24929 0.16619-0.58168-0.0831-0.83097l-0.66477-0.66477c-0.24929-0.24929-0.58168-0.16619-0.83097 0.083097l-5.5675 6.2322-3.407-3.1577c-0.24929-0.24929-0.58168-0.16619-0.83097 0.083097l-0.66477 0.66477c-0.24929 0.24929-0.16619 0.58168 0.083097 0.83097l4.5703 4.1548c0.24929 0.24929 0.58168 0.16619 0.83097-0.0831z"/>';
+    this._dom.copyColor.innerHTML = "", this._dom.copyColor.appendChild(this._createSVGIcon(t));
   }
-  _createSVGIcon(e) {
-    const t = document.createElementNS(
+  _createSVGIcon(t) {
+    const e = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "svg"
     );
-    return t.setAttribute("viewBox", "0 0 16 16"), t.setAttribute("width", "16px"), t.setAttribute("height", "16px"), t.innerHTML = e, t;
+    return e.setAttribute("viewBox", "0 0 16 16"), e.setAttribute("width", "16px"), e.setAttribute("height", "16px"), e.innerHTML = t, e;
   }
   _buildColorSliders() {
-    const e = u("div", ["yk-sliders"]);
-    return e.appendChild(this._buildHueSlider()), e.appendChild(this._buildOpacitySlider()), e;
+    const t = c("div", ["yk-sliders"]);
+    return t.appendChild(this._buildHueSlider()), t.appendChild(this._buildOpacitySlider()), t;
   }
   _buildHueSlider() {
-    const e = u("div", ["yk-hue-slider-wrapper"]), t = u("div", ["yk-hue-slider"]), o = u("a", ["yk-hue-slider-thumb"]);
-    return o.setAttribute("tabindex", "0"), e.appendChild(t), e.appendChild(o), this._onMouseDownHueSliderBind = this._onMouseDownHueSlider.bind(this), this._onMouseUpHueSliderBind = this._onMouseUpHueSlider.bind(this), this._onMouseMoveHueSliderBind = this._onMouseMoveHueSlider.bind(this), l(e, "pointerdown", this._onMouseDownHueSliderBind), l(o, "keydown", this._onKeyDownHueSlider.bind(this)), this._dom.hueSlider = t, this._dom.hueThumb = o, e;
+    const t = c("div", ["yk-hue-slider-wrapper"]), e = c("div", ["yk-hue-slider"]), o = c("div", ["yk-hue-slider-thumb"]);
+    return o.setAttribute("tabindex", "0"), t.appendChild(e), t.appendChild(o), this._onMouseDownHueSliderBind = this._onMouseDownHueSlider.bind(this), this._onMouseUpHueSliderBind = this._onMouseUpHueSlider.bind(this), this._onMouseMoveHueSliderBind = this._onMouseMoveHueSlider.bind(this), l(t, "pointerdown", this._onMouseDownHueSliderBind), l(o, "keydown", this._onKeyDownHueSlider.bind(this)), this._dom.hueSlider = e, this._dom.hueThumb = o, t;
   }
   _buildOpacitySlider() {
-    const e = u("div", ["yk-opacity-slider-wrapper"]), t = u("div", ["yk-opacity-color"]), o = u("a", ["yk-opacity-slider-thumb"]);
-    return o.setAttribute("tabindex", "0"), e.appendChild(t), e.appendChild(o), this._onMouseDownOpacitySliderBind = this._onMouseDownOpacitySlider.bind(this), this._onMouseUpOpacitySliderBind = this._onMouseUpOpacitySlider.bind(this), this._onMouseMoveOpacitySliderBind = this._onMouseMoveOpacitySlider.bind(this), l(
-      e,
+    const t = c("div", ["yk-opacity-slider-wrapper"]), e = c("div", ["yk-opacity-color"]), o = c("div", ["yk-opacity-slider-thumb"]);
+    return o.setAttribute("tabindex", "0"), t.appendChild(e), t.appendChild(o), this._onMouseDownOpacitySliderBind = this._onMouseDownOpacitySlider.bind(this), this._onMouseUpOpacitySliderBind = this._onMouseUpOpacitySlider.bind(this), this._onMouseMoveOpacitySliderBind = this._onMouseMoveOpacitySlider.bind(this), l(
+      t,
       "pointerdown",
       this._onMouseDownOpacitySliderBind
     ), l(
       o,
       "keydown",
       this._onKeyDownOpacitySlider.bind(this)
-    ), this._dom.opacitySlider = t, this._dom.opacityThumb = o, e;
+    ), this._dom.opacitySlider = e, this._dom.opacityThumb = o, t;
   }
   _buildColorPreview() {
-    const e = u("span", [
+    const t = c("span", [
       "yk-color-preview-wrapper"
-    ]), t = document.createElementNS(
+    ]), e = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "svg"
     );
-    t.setAttribute("width", "38"), t.setAttribute("height", "38");
+    e.setAttribute("width", "38"), e.setAttribute("height", "38");
     const o = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "circle"
     );
-    return o.setAttribute("cx", "19"), o.setAttribute("cy", "19"), o.setAttribute("r", "18"), o.classList.add("yk-preview-stroke"), t.innerHTML = '<pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><path fill="#DBDBDB" d="M0 0h3v3H0z"/><path fill="#fff" d="M3 0h3v3H3z"/><path fill="#DBDBDB" d="M3 3h3v3H3z"/><path fill="#fff" d="M0 3h3v3H0z"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)"/>', t.appendChild(o), e.appendChild(t), this._dom.colorPreview = o, e;
+    return o.setAttribute("cx", "19"), o.setAttribute("cy", "19"), o.setAttribute("r", "18"), o.classList.add("yk-preview-stroke"), e.innerHTML = '<pattern id="transparent-grid" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><path fill="#DBDBDB" d="M0 0h3v3H0z"/><path fill="#fff" d="M3 0h3v3H3z"/><path fill="#DBDBDB" d="M3 3h3v3H3z"/><path fill="#fff" d="M0 3h3v3H0z"/></pattern></defs><circle cx="19" cy="19" r="18" fill="url(#transparent-grid)"/>', e.appendChild(o), t.appendChild(e), this._dom.colorPreview = o, t;
   }
   _rgbUpdateView() {
     this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb();
   }
-  _updateHEXColorSection(e, t, o, i, s, r, h) {
-    const c = t.target, { rgb: _, hex: g } = this._color;
-    if (o(_[e], i)) {
-      _[e] = s(_[e], 1), this._color.hex = g.substring(0, r) + w(d(_[e], 0, 255)) + g.substring(h);
-      const { r: S, g: k, b: H } = _;
-      this._color.hsv = p.RGBtoHSV(S, k, H), this._rgbUpdateView();
+  _updateHEXColorSection(t, e, o, i, s, r, h) {
+    const u = e.target, { rgb: _, hex: g } = this._color;
+    if (o(_[t], i)) {
+      _[t] = s(_[t], 1), this._color.hex = g.substring(0, r) + w(p(_[t], 0, 255)) + g.substring(h);
+      const { r: k, g: S, b: H } = _;
+      this._color.hsv = d.RGBtoHSV(k, S, H), this._rgbUpdateView();
     }
-    c.value = this._color.hex, c.setSelectionRange(r, h), t.preventDefault();
+    u.value = this._color.hex, u.setSelectionRange(r, h), e.preventDefault();
   }
-  _updateHEXAlphaSection(e, t, o, i) {
-    const s = e.target, { hex: r, a: h } = this._color;
-    t(h, o) && (this._color.a = parseFloat(i(h, 0.01).toFixed(2)), s.value = this._color.hex = r.substring(0, 7) + w(d(this._color.a * 255, 0, 255)), this._updateColorPreview(!0), this._updateOpacityThumb()), s.value = this._color.hex, s.setSelectionRange(7, 9), e.preventDefault();
+  _updateHEXAlphaSection(t, e, o, i) {
+    const s = t.target, { hex: r, a: h } = this._color;
+    e(h, o) && (this._color.a = parseFloat(i(h, 0.01).toFixed(2)), s.value = this._color.hex = r.substring(0, 7) + w(p(this._color.a * 255, 0, 255)), this._updateColorPreview(!0), this._updateOpacityThumb()), s.value = this._color.hex, s.setSelectionRange(7, 9), t.preventDefault();
   }
-  _updateOpacityValue(e) {
-    this._color.a = parseFloat(e.toFixed(2)), this._currentRepresentation == "hex" ? (this._updateHEXColor(), this._updateHEXInput()) : this._dom.inputAlpha.value = this._color.a, this._updateColorPreview(!0);
+  _updateOpacityValue(t) {
+    this._color.a = parseFloat(t.toFixed(2)), this._currentRepresentation == "hex" ? (this._updateHEXColor(), this._updateHEXInput()) : this._dom.inputAlpha.value = this._color.a, this._updateColorPreview(!0);
   }
   _updatePosition() {
-    if (this._options.target != null) {
-      if (!a._isTargetInViewport(this._options.target)) {
+    if (this._dom.target != null) {
+      if (!a._isTargetInViewport(this._dom.target)) {
         this.close();
         return;
       }
       this._setPositionAxis(this._getPositionAxis());
     }
   }
-  _attachToContainer(e) {
+  _attachToContainer(t) {
     if (!this._options.container)
       throw new Error("YKColorPicker:: container is not defined");
-    let t = null;
-    if (typeof this._options.container == "string" ? t = document.getElementById(this._options.container) : t = this._options.container, !t)
+    let e = null;
+    if (typeof this._options.container == "string" ? e = document.querySelector(this._options.container) : this._options.container && this._options.container.nodeType == Node.ELEMENT_NODE && (e = this._options.container), !e)
       throw ReferenceError(
         "ColorPicker:: container to set color picker is undefined"
       );
     this._removeWindowEvents();
     const { overlayWrapper: o } = this._dom, i = o.parentElement;
-    t.appendChild(o), o.className = "", o.classList.add(
-      "yk-overlay-wrapper",
-      "yk-overlay-wrapper--static",
-      "yk-overlay-wrapper--open",
-      "yk-overlay-wrapper--" + this._options.theme
-    ), this._updateGUI(), this._isOpen = !0, e && i != o.parentElement && this._options.onContainerChange && this._options.onContainerChange(this, i);
+    e.appendChild(o), o.classList.add("yk-overlay-wrapper--static"), this._updateTheme(this._options.theme), this._updateGUI(), t && i != o.parentElement && this._options.onContainerChange && this._options.onContainerChange(this, i);
   }
   _attachToBody() {
     this._removeWindowEvents();
-    const { overlayWrapper: e } = this._dom, t = e.parentElement;
-    document.body.appendChild(e), e.className = "", e.classList.add(
-      "yk-overlay-wrapper",
-      "yk-overlay-wrapper--open",
-      "yk-overlay-wrapper--" + this._options.theme
-    ), this._updateGUI(), this._updatePosition(), l(window, "resize", this._onResizeScrollWindowBind), l(window, "scroll", this._onResizeScrollWindowBind), l(document, "click", this._onClickCloseBind), l(document, "keyup", this._onKeyUpCloseBind), this._isOpen = !0, t != e.parentElement && this._options.onContainerChange && this._options.onContainerChange(this, t);
+    const { overlayWrapper: t } = this._dom, e = t.parentElement;
+    document.body.appendChild(t), t.classList.remove("yk-overlay-wrapper--static"), this._updateTheme(this._options.theme), this._updateGUI(), this._updatePosition(), l(window, "resize", this._onResizeScrollWindowBind), l(window, "scroll", this._onResizeScrollWindowBind), l(document, "click", this._onClickCloseBind), l(document, "keyup", this._onKeyUpCloseBind), e != t.parentElement && this._options.onContainerChange && this._options.onContainerChange(this, e);
   }
   _detachOverlay() {
-    var e;
-    this._dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open"), this._removeWindowEvents(), this._isOpen = !1, (e = this._options.target) == null || e.focus();
+    var t;
+    this._dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open"), this._removeWindowEvents(), this._isOpen = !1, (t = this._dom.target) == null || t.focus();
   }
-  _onKeydownCursor(e) {
-    if (["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"].includes(e.key)) {
-      switch (e.preventDefault(), e.stopPropagation(), e.key) {
+  _onKeydownCursor(t) {
+    if (["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"].includes(t.key)) {
+      switch (t.preventDefault(), t.stopPropagation(), t.key) {
         case "ArrowUp":
           {
-            let t = Math.round(this._color.hsv.v);
-            t < 100 && (this._color.hsv.v = t + 1);
+            let e = Math.round(this._color.hsv.v);
+            e < 100 && (this._color.hsv.v = e + 1);
           }
           break;
         case "ArrowDown":
           {
-            let t = Math.round(this._color.hsv.v);
-            t > 0 && (this._color.hsv.v = t - 1);
+            let e = Math.round(this._color.hsv.v);
+            e > 0 && (this._color.hsv.v = e - 1);
           }
           break;
         case "ArrowRight":
           {
-            let t = Math.round(this._color.hsv.s);
-            t < 100 && (this._color.hsv.s = t + 1);
+            let e = Math.round(this._color.hsv.s);
+            e < 100 && (this._color.hsv.s = e + 1);
           }
           break;
         case "ArrowLeft":
           {
-            let t = Math.round(this._color.hsv.s);
-            t > 0 && (this._color.hsv.s = t - 1);
+            let e = Math.round(this._color.hsv.s);
+            e > 0 && (this._color.hsv.s = e - 1);
           }
           break;
       }
       this._updateCursorThumb(), this._updateInputsValue(), this._updateColorPreview(!0);
     }
   }
-  _onClickTarget(e) {
-    e.stopPropagation(), this._targetKeydownOpen = !0, this._isOpen ? this.close() : this.open();
+  _onClickTarget(t) {
+    t.stopPropagation(), this._targetKeydownOpen = !0, this._isOpen ? this.close() : this.open();
   }
-  _onMouseDownCursor(e) {
-    this._dc = !0, l(document, "pointermove", this._onMouseMoveCursorBind), l(document, "pointerup", this._onMouseUpCursorBind), this._onMouseMoveCursorBind(e);
+  _onMouseDownCursor(t) {
+    this._dc = !0, l(document, "pointermove", this._onMouseMoveCursorBind), l(document, "pointerup", this._onMouseUpCursorBind), this._onMouseMoveCursorBind(t);
   }
-  _onMouseUpCursor(e) {
-    document.removeEventListener("pointermove", this._onMouseMoveCursorBind), document.removeEventListener("pointerup", this._onMouseUpCursorBind), this._dom.overlayWrapper.contains(e.target) && (this._dc = !1), this._dom.cursor.focus();
+  _onMouseUpCursor(t) {
+    document.removeEventListener("pointermove", this._onMouseMoveCursorBind), document.removeEventListener("pointerup", this._onMouseUpCursorBind), this._dom.overlayWrapper.contains(t.target) && (this._dc = !1), this._dom.cursor.focus();
   }
-  _onMouseMoveCursor(e) {
-    const { x: t, y: o } = this._getCursorPosition(e.clientX, e.clientY);
-    this._dom.cursor.style.translate = `${t}px ${o}px`;
+  _onMouseMoveCursor(t) {
+    const { x: e, y: o } = this._getCursorPosition(t.clientX, t.clientY);
+    this._dom.cursor.style.translate = `${e}px ${o}px`;
     const i = this._dom.palette.offsetHeight, s = this._dom.palette.offsetWidth;
-    this._color.hsv.s = t / s * 100, this._color.hsv.v = (i - o) / i * 100, this._updateSettingsView();
+    this._color.hsv.s = e / s * 100, this._color.hsv.v = (i - o) / i * 100, this._updateSettingsView();
   }
   _onClickInputsSwitch() {
     switch (this._currentRepresentation) {
@@ -756,48 +776,48 @@ const a = class a {
         break;
     }
   }
-  _onKeyDownAlphaInput(e) {
-    const t = e.target, { a: o } = this._color;
-    switch (e.key) {
+  _onKeyDownAlphaInput(t) {
+    const e = t.target, { a: o } = this._color;
+    switch (t.key) {
       case "ArrowUp":
         if (o < 1) {
           let i = parseFloat((o + 0.01).toFixed(2));
-          i > 1 && (i = 1), t.value = (this._color.a = i).toString(), this._updateColorPreview(!0), this._updateOpacityThumb();
+          i > 1 && (i = 1), e.value = (this._color.a = i).toString(), this._updateColorPreview(!0), this._updateOpacityThumb();
         }
         break;
       case "ArrowDown":
         if (o > 0) {
           let i = parseFloat((o - 0.01).toFixed(2));
-          i < 0 && (i = 0), t.value = (this._color.a = i).toString(), this._updateColorPreview(!0), this._updateOpacityThumb();
+          i < 0 && (i = 0), e.value = (this._color.a = i).toString(), this._updateColorPreview(!0), this._updateOpacityThumb();
         }
         break;
       case ".":
-        /(\.)/.test(t.value) && e.preventDefault();
+        /(\.)/.test(e.value) && t.preventDefault();
         break;
     }
   }
-  _onKeyUpAlphaInput(e) {
-    const t = e.target;
-    if (/^(0(\.\d{1,2})?|(0*)1?)$/.test(t.value) || t.value == "") {
-      const o = parseFloat(t.value) || 0;
+  _onKeyUpAlphaInput(t) {
+    const e = t.target;
+    if (/^(0(\.\d{1,2})?|(0*)1?)$/.test(e.value) || e.value == "") {
+      const o = parseFloat(e.value) || 0;
       !isNaN(o) && o >= 0 && o <= 1 && (this._color.a = o, this._updateColorPreview(!0), this._updateOpacityThumb());
     }
   }
-  _onChangeAlphaInput(e) {
-    e.target && (e.target.value = this._color.a.toString());
+  _onChangeAlphaInput(t) {
+    t.target && (t.target.value = this._color.a.toString());
   }
-  _onKeyDownInputHEX(e) {
-    const t = e.target;
-    switch (e.key) {
+  _onKeyDownInputHEX(t) {
+    const e = t.target;
+    switch (t.key) {
       case "ArrowUp":
         {
           /^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(
-            t.value
-          ) || (t.value = this._color.hex);
-          const o = this._getCaretPosition(t), i = t.value.length;
+            e.value
+          ) || (e.value = this._color.hex);
+          const o = this._getCaretPosition(e), i = e.value.length;
           i <= 5 ? o < 2 ? this._updateHEXColorSection(
             "r",
-            e,
+            t,
             a._lt,
             255,
             a._add,
@@ -805,7 +825,7 @@ const a = class a {
             3
           ) : o < 3 ? this._updateHEXColorSection(
             "g",
-            e,
+            t,
             a._lt,
             255,
             a._add,
@@ -813,20 +833,20 @@ const a = class a {
             5
           ) : o <= 4 && i <= 4 || o < 4 ? this._updateHEXColorSection(
             "b",
-            e,
+            t,
             a._lt,
             255,
             a._add,
             5,
             7
           ) : o <= 5 && this._updateHEXAlphaSection(
-            e,
+            t,
             a._lt,
             1,
             a._add
           ) : o < 3 ? this._updateHEXColorSection(
             "r",
-            e,
+            t,
             a._lt,
             255,
             a._add,
@@ -834,7 +854,7 @@ const a = class a {
             3
           ) : o < 5 ? this._updateHEXColorSection(
             "g",
-            e,
+            t,
             a._lt,
             255,
             a._add,
@@ -842,14 +862,14 @@ const a = class a {
             5
           ) : o <= 7 && i == 7 || o < 7 ? this._updateHEXColorSection(
             "b",
-            e,
+            t,
             a._lt,
             255,
             a._add,
             5,
             7
           ) : o <= 9 && this._updateHEXAlphaSection(
-            e,
+            t,
             a._lt,
             1,
             a._add
@@ -859,12 +879,12 @@ const a = class a {
       case "ArrowDown":
         {
           /^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(
-            t.value
-          ) || (t.value = this._color.hex);
-          const o = this._getCaretPosition(t), i = t.value.length;
+            e.value
+          ) || (e.value = this._color.hex);
+          const o = this._getCaretPosition(e), i = e.value.length;
           i <= 5 ? o < 2 ? this._updateHEXColorSection(
             "r",
-            e,
+            t,
             a._gt,
             0,
             a._sub,
@@ -872,7 +892,7 @@ const a = class a {
             3
           ) : o < 3 ? this._updateHEXColorSection(
             "g",
-            e,
+            t,
             a._gt,
             0,
             a._sub,
@@ -880,20 +900,20 @@ const a = class a {
             5
           ) : o <= 4 && i <= 4 || o < 4 ? this._updateHEXColorSection(
             "b",
-            e,
+            t,
             a._gt,
             0,
             a._sub,
             5,
             7
           ) : o <= 5 && this._updateHEXAlphaSection(
-            e,
+            t,
             a._gt,
             0,
             a._sub
           ) : o < 3 ? this._updateHEXColorSection(
             "r",
-            e,
+            t,
             a._gt,
             0,
             a._sub,
@@ -901,7 +921,7 @@ const a = class a {
             3
           ) : o < 5 ? this._updateHEXColorSection(
             "g",
-            e,
+            t,
             a._gt,
             0,
             a._sub,
@@ -909,14 +929,14 @@ const a = class a {
             5
           ) : o <= 7 && i == 7 || o < 7 ? this._updateHEXColorSection(
             "b",
-            e,
+            t,
             a._gt,
             0,
             a._sub,
             5,
             7
           ) : o <= 9 && this._updateHEXAlphaSection(
-            e,
+            t,
             a._gt,
             0,
             a._sub
@@ -925,20 +945,20 @@ const a = class a {
         break;
     }
   }
-  _onInputHEX(e) {
-    const t = p.HEXtoRGBA(
-      e.target.value.trim()
+  _onInputHEX(t) {
+    const e = d.HEXtoRGBA(
+      t.target.value.trim()
     );
-    if (t != null) {
-      const { r: o, g: i, b: s, a: r } = t;
-      this._color.a = r, this._color.rgb = { r: o, g: i, b: s }, this._color.hex = p.RGBAtoHEX(o, i, s, r), this._color.hsv = p.RGBtoHSV(o, i, s), this._updateColorPreview(!0), this._updateHueThumb(), this._updateOpacityThumb(), this._updateCursorThumb();
+    if (e != null) {
+      const { r: o, g: i, b: s, a: r } = e;
+      this._color.a = r, this._color.rgb = { r: o, g: i, b: s }, this._color.hex = d.RGBAtoHEX(o, i, s, r), this._color.hsv = d.RGBtoHSV(o, i, s), this._updateColorPreview(!0), this._updateHueThumb(), this._updateOpacityThumb(), this._updateCursorThumb();
     }
   }
-  _onChangeInputHEX(e) {
-    e.target.value = this._color.hex;
+  _onChangeInputHEX(t) {
+    t.target.value = this._color.hex;
   }
-  _onKeyDownInputA(e) {
-    const { target: t, key: o } = e;
+  _onKeyDownInputA(t) {
+    const { target: e, key: o } = t;
     switch (o) {
       case "ArrowUp":
         switch (this._currentRepresentation) {
@@ -946,15 +966,15 @@ const a = class a {
             {
               let { r: i, g: s, b: r } = this._color.getRGB();
               i < 255 && (this._color.rgb.r = parseInt(
-                t.value = (++i).toString()
-              ), this._color.hsv = p.RGBtoHSV(i, s, r), this._rgbUpdateView());
+                e.value = (++i).toString()
+              ), this._color.hsv = d.RGBtoHSV(i, s, r), this._rgbUpdateView());
             }
             break;
           case "hsv":
           case "hsl":
             {
               let { h: i } = this._color.hsv;
-              i = d(i, 0, 360), i < 360 && (t.value = ++i + "°", this._color.hsv.h = this._color.hsl.h = i, this._updateColorPreview(!0), this._updateHueThumb());
+              i = p(i, 0, 360), i < 360 && (e.value = ++i + "°", this._color.hsv.h = this._color.hsl.h = i, this._updateColorPreview(!0), this._updateHueThumb());
             }
             break;
         }
@@ -965,52 +985,52 @@ const a = class a {
             {
               let { r: i, g: s, b: r } = this._color.getRGB();
               i > 0 && (this._color.rgb.r = parseInt(
-                t.value = (--i).toString()
-              ), this._color.hsv = p.RGBtoHSV(i, s, r), this._rgbUpdateView());
+                e.value = (--i).toString()
+              ), this._color.hsv = d.RGBtoHSV(i, s, r), this._rgbUpdateView());
             }
             break;
           case "hsv":
           case "hsl":
             {
               let { h: i } = this._color.hsv;
-              i = d(i, 0, 360), i > 0 && (t.value = --i + "°", this._color.hsv.h = this._color.hsl.h = i, this._updateColorPreview(!0), this._updateHueThumb());
+              i = p(i, 0, 360), i > 0 && (e.value = --i + "°", this._color.hsv.h = this._color.hsl.h = i, this._updateColorPreview(!0), this._updateHueThumb());
             }
             break;
         }
         break;
     }
   }
-  _onInputA(e) {
-    const t = parseInt(e.target.value || "0");
-    if (/^(\d{1,3})(°?)$/.test(t.toString()))
+  _onInputA(t) {
+    const e = parseInt(t.target.value || "0");
+    if (/^(\d{1,3})(°?)$/.test(e.toString()))
       switch (this._currentRepresentation) {
         case "rgb":
           {
             const { g: o, b: i } = this._color.getRGB();
-            !isNaN(t) && t >= 0 && t <= 255 && (this._color.rgb.r = t, this._color.hsv = p.RGBtoHSV(t, o, i), this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb());
+            !isNaN(e) && e >= 0 && e <= 255 && (this._color.rgb.r = e, this._color.hsv = d.RGBtoHSV(e, o, i), this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb());
           }
           break;
         case "hsv":
         case "hsl":
-          !isNaN(t) && t >= 0 && t <= 360 && (this._color.hsv.h = this._color.hsl.h = t, this._updateColorPreview(!0), this._updateHueThumb());
+          !isNaN(e) && e >= 0 && e <= 360 && (this._color.hsv.h = this._color.hsl.h = e, this._updateColorPreview(!0), this._updateHueThumb());
           break;
       }
   }
-  _onChangeInputA(e) {
-    let t = e.target.value;
+  _onChangeInputA(t) {
+    let e = t.target.value;
     switch (this._currentRepresentation) {
       case "rgb":
-        t = d(this._color.rgb.r, 0, 255).toString();
+        e = p(this._color.rgb.r, 0, 255).toString();
         break;
       case "hsv":
       case "hsl":
-        t = `${this._color.getHSV().h}°`;
+        e = `${this._color.getHSV().h}°`;
         break;
     }
-    e.target.value = t;
+    t.target.value = e;
   }
-  _onKeyDownInputB(e) {
-    const { target: t, key: o } = e;
+  _onKeyDownInputB(t) {
+    const { target: e, key: o } = t;
     switch (o) {
       case "ArrowUp":
         switch (this._currentRepresentation) {
@@ -1018,22 +1038,21 @@ const a = class a {
             {
               let { r: i, g: s, b: r } = this._color.getRGB();
               s < 255 && (this._color.rgb.g = parseInt(
-                t.value = (++s).toString()
-              ), this._color.hsv = p.RGBtoHSV(i, s, r), this._rgbUpdateView());
+                e.value = (++s).toString()
+              ), this._color.hsv = d.RGBtoHSV(i, s, r), this._rgbUpdateView());
             }
             break;
           case "hsv":
             {
               let { s: i } = this._color.getHSV();
-              i < 100 && (t.value = ++i + "%", this._color.hsv.s = i, this._updateColorPreview(!0), this._updateCursorThumb());
+              i < 100 && (e.value = ++i + "%", this._color.hsv.s = i, this._updateColorPreview(!0), this._updateCursorThumb());
             }
             break;
           case "hsl":
             {
-              console.log(this._color.hsv.s);
               const { h: i, s, l: r } = this._color.getHSL();
               let h = s;
-              h < 100 && (++h, this._color.hsl.s = h, this._color.hsv = p.HSLtoHSV(i, h, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), t.value = h + "%", this._dom.inputC.value = this._color.hsl.l + "%");
+              h < 100 && (++h, this._color.hsl.s = h, this._color.hsv = d.HSLtoHSV(i, h, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputC.value = this._color.hsl.l + "%");
             }
             break;
         }
@@ -1044,65 +1063,65 @@ const a = class a {
             {
               let { r: i, g: s, b: r } = this._color.getRGB();
               s > 0 && (this._color.rgb.g = parseInt(
-                t.value = (--s).toString()
-              ), this._color.hsv = p.RGBtoHSV(i, s, r), this._rgbUpdateView());
+                e.value = (--s).toString()
+              ), this._color.hsv = d.RGBtoHSV(i, s, r), this._rgbUpdateView());
             }
             break;
           case "hsv":
             {
               let { s: i } = this._color.getHSV();
-              i > 0 && (t.value = --i + "%", this._color.hsv.s = i, this._updateColorPreview(!0), this._updateCursorThumb());
+              i > 0 && (e.value = --i + "%", this._color.hsv.s = i, this._updateColorPreview(!0), this._updateCursorThumb());
             }
             break;
           case "hsl":
             {
               const { h: i, s, l: r } = this._color.getHSL();
               let h = s;
-              h > 0 && (--h, this._color.hsl.s = h, this._color.hsv = p.HSLtoHSV(i, h, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), t.value = h + "%", this._dom.inputC.value = this._color.hsl.l + "%");
+              h > 0 && (--h, this._color.hsl.s = h, this._color.hsv = d.HSLtoHSV(i, h, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputC.value = this._color.hsl.l + "%");
             }
             break;
         }
         break;
     }
   }
-  _onInputB(e) {
-    const t = parseInt(e.target.value || "0");
-    if (/^(\d{1,3})(%?)$/.test(t.toString()))
+  _onInputB(t) {
+    const e = parseInt(t.target.value || "0");
+    if (/^(\d{1,3})(%?)$/.test(e.toString()))
       switch (this._currentRepresentation) {
         case "rgb":
           {
             const { r: o, b: i } = this._color.getRGB();
-            !isNaN(t) && t >= 0 && t <= 255 && (this._color.rgb.g = t, this._color.hsv = p.RGBtoHSV(o, t, i), this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb());
+            !isNaN(e) && e >= 0 && e <= 255 && (this._color.rgb.g = e, this._color.hsv = d.RGBtoHSV(o, e, i), this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb());
           }
           break;
         case "hsv":
-          !isNaN(t) && t >= 0 && t <= 100 && (this._color.hsv.s = t, this._updateColorPreview(!0), this._updateCursorThumb());
+          !isNaN(e) && e >= 0 && e <= 100 && (this._color.hsv.s = e, this._updateColorPreview(!0), this._updateCursorThumb());
           break;
         case "hsl":
           {
             const { h: o, l: i } = this._color.getHSL();
-            !isNaN(t) && t >= 0 && t <= 100 && (this._color.hsv = p.HSLtoHSV(o, t, i), this._color.hsl = this._color.toHSL(), this._updateColorPreview(!0), this._updateCursorThumb(), this._dom.inputC.value = Math.round(this._color.hsl.l) + "%");
+            !isNaN(e) && e >= 0 && e <= 100 && (this._color.hsv = d.HSLtoHSV(o, e, i), this._color.hsl = this._color.toHSL(), this._updateColorPreview(!0), this._updateCursorThumb(), this._dom.inputC.value = Math.round(this._color.hsl.l) + "%");
           }
           break;
       }
   }
-  _onChangeInputB(e) {
-    let t = e.target.value;
+  _onChangeInputB(t) {
+    let e = t.target.value;
     switch (this._currentRepresentation) {
       case "rgb":
-        t = this._color.getRGB().g;
+        e = this._color.getRGB().g;
         break;
       case "hsv":
-        t = `${this._color.getHSV().s}%`;
+        e = `${this._color.getHSV().s}%`;
         break;
       case "hsl":
-        t = `${this._color.getHSL().s}%`;
+        e = `${this._color.getHSL().s}%`;
         break;
     }
-    e.target.value = t;
+    t.target.value = e;
   }
-  _onKeyDownInputC(e) {
-    const { target: t, key: o } = e;
+  _onKeyDownInputC(t) {
+    const { target: e, key: o } = t;
     switch (o) {
       case "ArrowUp":
         switch (this._currentRepresentation) {
@@ -1110,21 +1129,21 @@ const a = class a {
             {
               let { r: i, g: s, b: r } = this._color.getRGB();
               r < 255 && (this._color.rgb.b = parseInt(
-                t.value = (++r).toString()
-              ), this._color.hsv = p.RGBtoHSV(i, s, r), this._rgbUpdateView());
+                e.value = (++r).toString()
+              ), this._color.hsv = d.RGBtoHSV(i, s, r), this._rgbUpdateView());
             }
             break;
           case "hsv":
             {
               let { v: i } = this._color.getHSV();
-              i < 100 && (t.value = ++i + "%", this._color.hsv.v = i, this._updateColorPreview(!0), this._updateCursorThumb());
+              i < 100 && (e.value = ++i + "%", this._color.hsv.v = i, this._updateColorPreview(!0), this._updateCursorThumb());
             }
             break;
           case "hsl":
             {
               const { h: i, s, l: r } = this._color.getHSL();
               let h = r;
-              h < 100 && (++h, this._color.hsl.l = h, this._color.hsv = p.HSLtoHSV(i, s, h), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), t.value = h + "%", this._dom.inputB.value = this._color.hsl.s + "%");
+              h < 100 && (++h, this._color.hsl.l = h, this._color.hsv = d.HSLtoHSV(i, s, h), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputB.value = this._color.hsl.s + "%");
             }
             break;
         }
@@ -1135,110 +1154,110 @@ const a = class a {
             {
               let { r: i, g: s, b: r } = this._color.getRGB();
               r > 0 && (this._color.rgb.b = parseInt(
-                t.value = (--r).toString()
-              ), this._color.hsv = p.RGBtoHSV(i, s, r), this._rgbUpdateView());
+                e.value = (--r).toString()
+              ), this._color.hsv = d.RGBtoHSV(i, s, r), this._rgbUpdateView());
             }
             break;
           case "hsv":
             {
               let { v: i } = this._color.getHSV();
-              i > 0 && (t.value = --i + "%", this._color.hsv.v = i, this._updateColorPreview(!0), this._updateCursorThumb());
+              i > 0 && (e.value = --i + "%", this._color.hsv.v = i, this._updateColorPreview(!0), this._updateCursorThumb());
             }
             break;
           case "hsl":
             {
               const { h: i, s, l: r } = this._color.getHSL();
               let h = r;
-              r > 0 && (--h, this._color.hsl.l = h, this._color.hsv = p.HSLtoHSV(i, s, h), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), t.value = h + "%", this._dom.inputB.value = this._color.hsl.s + "%");
+              r > 0 && (--h, this._color.hsl.l = h, this._color.hsv = d.HSLtoHSV(i, s, h), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputB.value = this._color.hsl.s + "%");
             }
             break;
         }
         break;
     }
   }
-  _onInputC(e) {
-    const t = parseInt(e.target.value || "0");
-    if (/^(\d{1,3})(%?)$/.test(t.toString()))
+  _onInputC(t) {
+    const e = parseInt(t.target.value || "0");
+    if (/^(\d{1,3})(%?)$/.test(e.toString()))
       switch (this._currentRepresentation) {
         case "rgb":
           {
             const { r: o, g: i } = this._color.getRGB();
-            !isNaN(t) && t >= 0 && t <= 255 && (this._color.rgb.b = t, this._color.hsv = p.RGBtoHSV(o, i, t), this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb());
+            !isNaN(e) && e >= 0 && e <= 255 && (this._color.rgb.b = e, this._color.hsv = d.RGBtoHSV(o, i, e), this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb());
           }
           break;
         case "hsv":
-          !isNaN(t) && t >= 0 && t <= 100 && (this._color.hsv.v = t, this._updateColorPreview(!0), this._updateCursorThumb());
+          !isNaN(e) && e >= 0 && e <= 100 && (this._color.hsv.v = e, this._updateColorPreview(!0), this._updateCursorThumb());
           break;
         case "hsl":
           {
             const { h: o, s: i } = this._color.getHSL();
-            !isNaN(t) && t >= 0 && t <= 100 && (this._color.hsv = p.HSLtoHSV(o, i, t), this._color.hsl = this._color.toHSL(), this._updateColorPreview(!0), this._updateCursorThumb(), this._dom.inputB.value = Math.round(this._color.hsl.s) + "%");
+            !isNaN(e) && e >= 0 && e <= 100 && (this._color.hsv = d.HSLtoHSV(o, i, e), this._color.hsl = this._color.toHSL(), this._updateColorPreview(!0), this._updateCursorThumb(), this._dom.inputB.value = Math.round(this._color.hsl.s) + "%");
           }
           break;
       }
   }
-  _onChangeInputC(e) {
-    let t = e.target.value;
+  _onChangeInputC(t) {
+    let e = t.target.value;
     switch (this._currentRepresentation) {
       case "rgb":
-        t = this._color.getRGB().b;
+        e = this._color.getRGB().b;
         break;
       case "hsv":
-        t = `${this._color.getHSV().v}%`;
+        e = `${this._color.getHSV().v}%`;
         break;
       case "hsl":
-        t = `${this._color.getHSL().l}%`;
+        e = `${this._color.getHSL().l}%`;
         break;
     }
-    e.target.value = t;
+    t.target.value = e;
   }
   _onClickCopyColor() {
     this._copyTimeout && clearTimeout(this._copyTimeout);
-    const e = document.createElement("input");
-    e.style.position = "absolute", e.style.left = "-99999px", e.style.top = "-99999px", e.value = this._getColorText() || "", document.body.appendChild(e), e.select();
+    const t = document.createElement("input");
+    t.style.position = "absolute", t.style.left = "-99999px", t.style.top = "-99999px", t.value = this._getColorText() || "", document.body.appendChild(t), t.select();
     try {
       document.execCommand("copy"), this._attachCheckIcon(), this._dom.copyColor.focus(), this._options.onCopy(this), this._copyTimeout = setTimeout(() => {
         this._attachCopyIcon(), this._copyTimeout = null;
       }, 600);
-    } catch (t) {
-      throw document.body.removeChild(e), new Error(`YKColorPicker:: Failed to copy color.
-` + t);
+    } catch (e) {
+      throw document.body.removeChild(t), new Error(`YKColorPicker:: Failed to copy color.
+` + e);
     }
   }
-  _onMouseDownHueSlider(e) {
-    e.preventDefault(), this._dc = !0, l(document, "pointermove", this._onMouseMoveHueSliderBind), l(document, "pointerup", this._onMouseUpHueSliderBind), this._dom.hueThumb.focus(), this._onMouseMoveHueSliderBind(e);
+  _onMouseDownHueSlider(t) {
+    t.preventDefault(), this._dc = !0, l(document, "pointermove", this._onMouseMoveHueSliderBind), l(document, "pointerup", this._onMouseUpHueSliderBind), this._dom.hueThumb.focus(), this._onMouseMoveHueSliderBind(t);
   }
-  _onMouseUpHueSlider(e) {
-    document.removeEventListener("pointermove", this._onMouseMoveHueSliderBind), document.removeEventListener("pointerup", this._onMouseUpHueSliderBind), this._dom.overlayWrapper.contains(e.target) && (this._dc = !1);
+  _onMouseUpHueSlider(t) {
+    document.removeEventListener("pointermove", this._onMouseMoveHueSliderBind), document.removeEventListener("pointerup", this._onMouseUpHueSliderBind), this._dom.overlayWrapper.contains(t.target) && (this._dc = !1);
   }
-  _onMouseMoveHueSlider(e) {
-    const { hueSlider: t, hueThumb: o } = this._dom, i = t.getBoundingClientRect(), s = i.width;
-    let r = e.clientX - i.left;
+  _onMouseMoveHueSlider(t) {
+    const { hueSlider: e, hueThumb: o } = this._dom, i = e.getBoundingClientRect(), s = i.width;
+    let r = t.clientX - i.left;
     r < 0 && (r = 0), r > s && (r = s), this._color.hsv.h = r / i.width * 360, o.style.translate = `${r}px`, this._updateSettingsView();
   }
-  _onMouseDownOpacitySlider(e) {
-    e.preventDefault(), this._dc = !0, l(document, "pointermove", this._onMouseMoveOpacitySliderBind), l(document, "pointerup", this._onMouseUpOpacitySliderBind), this._dom.opacityThumb.focus(), this._onMouseMoveOpacitySliderBind(e);
+  _onMouseDownOpacitySlider(t) {
+    t.preventDefault(), this._dc = !0, l(document, "pointermove", this._onMouseMoveOpacitySliderBind), l(document, "pointerup", this._onMouseUpOpacitySliderBind), this._dom.opacityThumb.focus(), this._onMouseMoveOpacitySliderBind(t);
   }
-  _onMouseUpOpacitySlider(e) {
+  _onMouseUpOpacitySlider(t) {
     document.removeEventListener(
       "pointermove",
       this._onMouseMoveOpacitySliderBind
-    ), document.removeEventListener("pointerup", this._onMouseUpOpacitySliderBind), this._dom.overlayWrapper.contains(e.target) && (this._dc = !1);
+    ), document.removeEventListener("pointerup", this._onMouseUpOpacitySliderBind), this._dom.overlayWrapper.contains(t.target) && (this._dc = !1);
   }
-  _onMouseMoveOpacitySlider(e) {
-    const { opacitySlider: t, opacityThumb: o } = this._dom, i = t.getBoundingClientRect(), s = i.width;
-    let r = e.clientX - i.left;
+  _onMouseMoveOpacitySlider(t) {
+    const { opacitySlider: e, opacityThumb: o } = this._dom, i = e.getBoundingClientRect(), s = i.width;
+    let r = t.clientX - i.left;
     o.focus(), r < 0 && (r = 0), r > s && (r = s), o.style.translate = `${r}px`, this._updateOpacityValue(r / s);
   }
-  _onKeyDownHueSlider(e) {
-    const { key: t } = e;
-    switch (t) {
+  _onKeyDownHueSlider(t) {
+    const { key: e } = t;
+    switch (e) {
       case "ArrowUp":
       case "ArrowRight":
         {
           const { hueThumb: o, hueSlider: i } = this._dom;
           let s = parseInt(o.style.translate);
-          !isNaN(s) && s < i.offsetWidth && (o.style.translate = `${++s}px`, this._color.hsv.h = s / i.offsetWidth * 360, this._updateSettingsView()), e.preventDefault();
+          !isNaN(s) && s < i.offsetWidth && (o.style.translate = `${++s}px`, this._color.hsv.h = s / i.offsetWidth * 360, this._updateSettingsView()), t.preventDefault();
         }
         break;
       case "ArrowDown":
@@ -1246,20 +1265,20 @@ const a = class a {
         {
           const { hueThumb: o, hueSlider: i } = this._dom;
           let s = parseInt(o.style.translate);
-          !isNaN(s) && s > 0 && (o.style.translate = `${--s}px`, this._color.hsv.h = s / i.offsetWidth * 360, this._updateSettingsView()), e.preventDefault();
+          !isNaN(s) && s > 0 && (o.style.translate = `${--s}px`, this._color.hsv.h = s / i.offsetWidth * 360, this._updateSettingsView()), t.preventDefault();
         }
         break;
     }
   }
-  _onKeyDownOpacitySlider(e) {
-    const { key: t } = e;
-    switch (t) {
+  _onKeyDownOpacitySlider(t) {
+    const { key: e } = t;
+    switch (e) {
       case "ArrowUp":
       case "ArrowRight":
         {
           const { opacityThumb: o, opacitySlider: i } = this._dom;
           let s = parseInt(o.style.translate);
-          !isNaN(s) && s < i.offsetWidth && (o.style.translate = `${++s}px`, this._updateOpacityValue(s / i.offsetWidth)), e.preventDefault();
+          !isNaN(s) && s < i.offsetWidth && (o.style.translate = `${++s}px`, this._updateOpacityValue(s / i.offsetWidth)), t.preventDefault();
         }
         break;
       case "ArrowDown":
@@ -1267,30 +1286,31 @@ const a = class a {
         {
           const { opacityThumb: o, opacitySlider: i } = this._dom;
           let s = parseInt(o.style.translate);
-          !isNaN(s) && s > 0 && (o.style.translate = `${--s}px`, this._updateOpacityValue(s / i.offsetWidth)), e.preventDefault();
+          !isNaN(s) && s > 0 && (o.style.translate = `${--s}px`, this._updateOpacityValue(s / i.offsetWidth)), t.preventDefault();
         }
         break;
     }
   }
-  _onKeyUpClose(e) {
-    const { target: t, key: o } = e;
+  _onKeyUpClose(t) {
+    const { target: e, key: o } = t;
     if (this._targetKeydownOpen && o == "Enter") {
       this._targetKeydownOpen = !1;
       return;
     }
-    if (o == "Enter" && this._isOpen && ![this._dom.copyColor, this._dom.btnSwitch].includes(t)) {
+    if (o == "Enter" && this._isOpen && ![this._dom.copyColor, this._dom.btnSwitch].includes(e)) {
       this.close();
       return;
     }
-    o == "Escape" && (this._prevColor != this.getHEX() && (this.setColor(this._prevColor), this._updateGUI(), this._options.onInput(this)), this.close());
+    o == "Escape" && (this._prevColor != this.getHEX() && this.setColor(this._prevColor), this.close());
   }
-  _onResizeScrollWindow(e) {
-    const { type: t } = e, { target: o, closeOnScroll: i, closeOnResize: s } = this._options;
-    if (t == "scroll" && i || t == "resize" && s)
+  _onResizeScrollWindow(t) {
+    const { type: e } = t, { target: o } = this._dom;
+    if (o == null)
+      return;
+    const { closeOnScroll: i, closeOnResize: s } = this._options;
+    if (e == "scroll" && i || e == "resize" && s)
       this.close();
     else {
-      if (o == null)
-        return;
       if (!a._isTargetInViewport(o)) {
         this.close();
         return;
@@ -1301,23 +1321,23 @@ const a = class a {
   _removeWindowEvents() {
     window.removeEventListener("resize", this._onResizeScrollWindowBind), window.removeEventListener("scroll", this._onResizeScrollWindowBind), document.removeEventListener("keyup", this._onKeyUpCloseBind), document.removeEventListener("click", this._onClickCloseBind);
   }
-  _getCursorPosition(e, t) {
+  _getCursorPosition(t, e) {
     const o = this._dom.palette.getBoundingClientRect();
-    let i = e - o.left, s = t - o.top;
+    let i = t - o.left, s = e - o.top;
     return i < 0 ? i = 0 : i > o.width && (i = o.width), s < 0 ? s = 0 : s > o.height && (s = o.height), {
       x: i,
       y: s
     };
   }
   _updateHEXColor() {
-    const { r: e, g: t, b: o } = this._color.rgb = this._color.toRGB();
-    this._color.hex = p.RGBAtoHEX(e, t, o, this._color.a);
+    const { r: t, g: e, b: o } = this._color.rgb = this._color.toRGB();
+    this._color.hex = d.RGBAtoHEX(t, e, o, this._color.a);
   }
   _getColorText() {
     switch (this._currentRepresentation) {
       case "rgb":
-        const { r: e, g: t, b: o } = this._color.getRGB();
-        return `rgba(${e}, ${t}, ${o}, ${this._color.a})`;
+        const { r: t, g: e, b: o } = this._color.getRGB();
+        return `rgba(${t}, ${e}, ${o}, ${this._color.a})`;
       case "hsv": {
         const { h: i, s, v: r } = this._color.getHSV();
         return `hsva(${i}, ${s}%, ${r}%, ${this._color.a})`;
@@ -1330,42 +1350,42 @@ const a = class a {
         return this.getHEX();
     }
   }
-  _getCaretPosition(e) {
-    let t = e.selectionStart || 0;
-    const o = e.value.length;
-    return t > o && (t = o), t;
+  _getCaretPosition(t) {
+    let e = t.selectionStart || 0;
+    const o = t.value.length;
+    return e > o && (e = o), e;
   }
   _getPositionAxis() {
-    const { target: e, position: t, positionFallback: o } = this._options;
-    if (!e || !t || !o)
+    const { position: t, positionFallback: e } = this._options, { target: o } = this._dom;
+    if (!o || !t || !e)
       return { x: 0, y: 0 };
-    const i = e.getBoundingClientRect(), s = this._dom.overlayWrapper.getBoundingClientRect(), r = document.documentElement.scrollTop, h = document.documentElement.scrollLeft, c = 6;
+    const i = o.getBoundingClientRect(), s = this._dom.overlayWrapper.getBoundingClientRect(), r = document.documentElement.scrollTop, h = document.documentElement.scrollLeft, u = 6;
     let _ = t;
     const g = a._enoughSpace(
       () => r + i.top,
       () => i.top,
-      s.height + c
-    ), S = a._enoughSpace(
+      s.height + u
+    ), k = a._enoughSpace(
       () => a._getPageHeight() - (r + i.top + i.height),
       () => window.innerHeight - (i.top + i.height),
-      s.height + c
-    ), k = a._enoughSpace(
+      s.height + u
+    ), S = a._enoughSpace(
       () => h + i.left,
       () => i.left,
-      s.width + c
+      s.width + u
     ), H = a._enoughSpace(
       () => a._getPageWidth() - (h + i.left + i.width),
       () => window.innerWidth - (i.left + i.width),
-      s.width + c
-    ), T = {
+      s.width + u
+    ), x = {
       t: g,
-      b: S,
-      l: k,
+      b: k,
+      l: S,
       r: H
     };
     let f = "";
-    for (let v = 0; v < o.length; v++)
-      f += o[v] + T[o[v]];
+    for (let v = 0; v < e.length; v++)
+      f += e[v] + x[e[v]];
     let y = "", C = "";
     for (let v = 1; v < f.length; v += 2) {
       const R = f[v];
@@ -1375,36 +1395,57 @@ const a = class a {
     let b = 0, m = 0;
     switch (_) {
       case "t":
-        m = i.top - s.height - c, b = i.left + i.width / 2 - s.width / 2;
+        m = i.top - s.height - u, b = i.left + i.width / 2 - s.width / 2;
         break;
       case "b":
-        m = i.top + i.height + c, b = i.left + i.width / 2 - s.width / 2;
+        m = i.top + i.height + u, b = i.left + i.width / 2 - s.width / 2;
         break;
       case "l":
-        m = i.top + i.height / 2 - s.height / 2, b = i.left - s.width - c;
+        m = i.top + i.height / 2 - s.height / 2, b = i.left - s.width - u;
         break;
       case "r":
-        m = i.top + i.height / 2 - s.height / 2, b = i.left + i.width + c;
+        m = i.top + i.height / 2 - s.height / 2, b = i.left + i.width + u;
         break;
     }
-    const B = window.innerWidth - document.documentElement.clientWidth, E = window.innerHeight - document.documentElement.clientHeight;
-    return window.innerWidth - B < b + s.width && (b -= b + s.width - window.innerWidth + B), window.innerHeight - E < m + s.height && (m -= m + s.height - window.innerHeight + E), b = Math.max(b, 0), m = Math.max(m, 0), {
+    const E = window.innerWidth - document.documentElement.clientWidth, B = window.innerHeight - document.documentElement.clientHeight;
+    return window.innerWidth - E < b + s.width && (b -= b + s.width - window.innerWidth + E), window.innerHeight - B < m + s.height && (m -= m + s.height - window.innerHeight + B), b = Math.max(b, 0), m = Math.max(m, 0), {
       x: b,
       y: m
     };
   }
-  _setPositionAxis(e) {
-    const { x: t, y: o } = e;
-    this._dom.overlayWrapper.style.top = `${o}px`, this._dom.overlayWrapper.style.left = `${t}px`;
+  _setPositionAxis(t) {
+    const { x: e, y: o } = t;
+    this._dom.overlayWrapper.style.top = `${o}px`, this._dom.overlayWrapper.style.left = `${e}px`;
   }
-  _updateRepresentation(e) {
-    this._currentRepresentation = e, this._updateInputs(), this._options.onRepresentationChange && this._options.onRepresentationChange(this);
+  _updateRepresentation(t) {
+    this._currentRepresentation = t, this._updateInputs(), this._options.onRepresentationChange && this._options.onRepresentationChange(this);
   }
-  static _isTargetInViewport(e) {
-    if (!e)
+  _updateTheme(t) {
+    if (this._dom.overlayWrapper.classList.remove(
+      "yk-overlay-wrapper--light",
+      "yk-overlay-wrapper--dark"
+    ), t !== "light" && t !== "dark")
+      throw new Error("YKColorPicker:: Theme must be light or dark");
+    this._dom.overlayWrapper.classList.add(`yk-overlay-wrapper--${t}`);
+  }
+  _updateTarget(t) {
+    let e = null;
+    if (typeof t == "string")
+      e = document.querySelector(t);
+    else if (t && t.nodeType == Node.ELEMENT_NODE)
+      e = t;
+    else if (t != null)
+      throw new Error(
+        "YKColorPicker:: target must be a string or an HTMLElement"
+      );
+    const o = this._dom.target;
+    o != null && o.removeEventListener("click", this._onClickTargetBind), this._dom.target = e, this._dom.target != null && l(this._dom.target, "click", this._onClickTargetBind), this._updatePosition(), this._options.onTargetChange(this, o);
+  }
+  static _isTargetInViewport(t) {
+    if (!t)
       return !1;
-    const t = e.getBoundingClientRect();
-    return t.top >= 0 && t.left >= 0 && t.bottom <= (window.innerHeight || document.documentElement.clientHeight) && t.right <= (window.innerWidth || document.documentElement.clientWidth);
+    const e = t.getBoundingClientRect();
+    return e.top >= 0 && e.left >= 0 && e.bottom <= (window.innerHeight || document.documentElement.clientHeight) && e.right <= (window.innerWidth || document.documentElement.clientWidth);
   }
   static _getPageHeight() {
     return Math.max(
@@ -1426,28 +1467,28 @@ const a = class a {
       document.documentElement.clientWidth
     );
   }
-  static _enoughSpace(e, t, o) {
-    return e() >= o ? t() >= o ? 2 : 1 : 0;
+  static _enoughSpace(t, e, o) {
+    return t() >= o ? e() >= o ? 2 : 1 : 0;
   }
-  static _buildOptions(e, t) {
-    const o = {}, i = Object.keys(e);
+  static _buildOptions(t, e) {
+    const o = {}, i = Object.keys(t);
     for (let s = 0; s < i.length; s++) {
       const r = i[s];
-      t.hasOwnProperty(r) == !0 ? o[r] = t[r] : o[r] = e[r];
+      e.hasOwnProperty(r) == !0 ? o[r] = e[r] : o[r] = t[r];
     }
     return o;
   }
-  static _lt(e, t) {
-    return e < t;
+  static _lt(t, e) {
+    return t < e;
   }
-  static _gt(e, t) {
-    return e > t;
+  static _gt(t, e) {
+    return t > e;
   }
-  static _add(e, t) {
-    return e + t;
+  static _add(t, e) {
+    return t + e;
   }
-  static _sub(e, t) {
-    return e - t;
+  static _sub(t, e) {
+    return t - e;
   }
 };
 a.DEFAULT_OPTIONS = {
@@ -1474,12 +1515,14 @@ a.DEFAULT_OPTIONS = {
   },
   onRepresentationChange: () => {
   },
+  onTargetChange: () => {
+  },
   onContainerChange: () => {
   }
 };
-let x = a;
+let I = a;
 export {
-  x as YKColorPicker,
+  I as YKColorPicker,
   A as YKColorPickerMode,
   M as YKColorPickerPosition
 };

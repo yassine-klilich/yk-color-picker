@@ -203,7 +203,7 @@ export const YKColorParser = {
     return `#${hexPad2(roundToRange(r, 0, 255))}${hexPad2(
       roundToRange(g, 0, 255)
     )}${hexPad2(roundToRange(b, 0, 255))}${
-      a == 1 ? "" : hexPad2(roundToRange(a, 0, 1) * 255)
+      a < 1 ? hexPad2(Math.round(a * 255)) : ""
     }`;
   },
 

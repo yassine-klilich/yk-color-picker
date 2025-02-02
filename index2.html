@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YKColorPicker Demo</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        background: #f4f4f4;
+        color: #333;
+      }
+      .color-picker-container {
+        width: 300px;
+        margin: 20px auto;
+        padding: 20px;
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      #color-display {
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
+        margin: 10px auto;
+        border: 1px solid #ccc;
+        background: #ff0000;
+      }
+      .color-info {
+        margin-top: 10px;
+        font-size: 16px;
+      }
+      .btn {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        font-size: 14px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>YKColorPicker Demo</h1>
+    <div class="color-picker-container">
+      <div id="color-display"></div>
+      <div class="color-info">
+        <p><strong>HEX:</strong> <span id="hex-value">#ff0000</span></p>
+        <p><strong>RGB:</strong> <span id="rgb-value">rgb(255, 0, 0)</span></p>
+        <p>
+          <strong>HSL:</strong> <span id="hsl-value">hsl(0, 100%, 50%)</span>
+        </p>
+      </div>
+      <button id="color-picker-trigger" class="btn">Pick a Color</button>
+    </div>
+
+    <script type="module">
+      import { YKColorPicker, YKColorPickerPosition } from "yk-color-picker";
+
+      const colorDisplay = document.getElementById("color-display");
+      const hexValue = document.getElementById("hex-value");
+      const rgbValue = document.getElementById("rgb-value");
+      const hslValue = document.getElementById("hsl-value");
+
+      window.colorPicker = new YKColorPicker({
+        target: document.getElementById("color-picker-trigger"),
+        color: "#ff0000",
+        onInput: (instance) => {
+          const hex = instance.getHEX();
+          const rgb = instance.getRGB();
+          const hsl = instance.getHSL();
+
+          colorDisplay.style.backgroundColor = hex;
+          hexValue.textContent = hex;
+          rgbValue.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+          hslValue.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+        },
+      });
+    </script>
+  </body>
+</html>

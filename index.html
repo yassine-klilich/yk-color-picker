@@ -33,6 +33,8 @@
 
     <button id="colorBox" class="color-box"></button>
 
+    <button id="colorBox2" class="color-box" style="margin-left: 20px"></button>
+
     <div id="container"></div>
     <div id="container-2"></div>
 
@@ -60,10 +62,13 @@
         },
         onInput: function (instance) {
           console.log("on input", instance);
-          colorBox.style.backgroundColor = instance.getHEX();
+          instance.target.style.backgroundColor = instance.getHEX();
         },
         onChange: function (instance) {
           console.log("on change", instance);
+        },
+        onTargetChange: function (instance, prevTarget) {
+          console.log("on target change", instance, prevTarget);
         },
         onContainerChange: function (instance, prevContainer) {
           console.log("on container change", instance, prevContainer);

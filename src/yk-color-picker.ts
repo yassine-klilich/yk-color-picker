@@ -50,7 +50,7 @@ export enum YKColorPickerMode {
 }
 
 export interface YKColorPickerOptions {
-  target?: HTMLElement | null;
+  target?: HTMLElement | string | null;
   container?: HTMLElement | string | null;
   position?: YKColorPickerPosition;
   positionFallback?: YKColorPickerPositionFallback;
@@ -66,6 +66,10 @@ export interface YKColorPickerOptions {
   onChange?: (instance: YKColorPicker) => void;
   onCopy?: (instance: YKColorPicker) => void;
   onRepresentationChange?: (instance: YKColorPicker) => void;
+  onTargetChange?: (
+    instance: YKColorPicker,
+    previousTarget: HTMLElement | null
+  ) => void;
   onContainerChange?: (
     instance: YKColorPicker,
     previousParent: HTMLElement
@@ -95,6 +99,7 @@ export class YKColorPicker {
     onChange: () => {},
     onCopy: () => {},
     onRepresentationChange: () => {},
+    onTargetChange: () => {},
     onContainerChange: () => {},
   };
 
@@ -129,13 +134,24 @@ export class YKColorPicker {
 
     const { target, representation } = this._options;
 
-    this._dom["target"] = target;
+    let _target: HTMLElement | null = null;
+    if (typeof target == "string") {
+      _target = document.querySelector(target);
+    } else if (target && target.nodeType == Node.ELEMENT_NODE) {
+      _target = target;
+    } else if (target !== null && target !== undefined) {
+      throw new Error(
+        "YKColorPicker:: target must be a string or an HTMLElement"
+      );
+    }
+
+    this._dom["target"] = _target;
     this._currentRepresentation = representation;
 
     // init click and enter key to target
-    if (target) {
+    if (_target) {
       this._onClickTargetBind = this._onClickTarget.bind(this);
-      attachEvent(target, "click", this._onClickTargetBind);
+      attachEvent(_target, "click", this._onClickTargetBind);
     }
 
     this._initDOM();
@@ -146,17 +162,23 @@ export class YKColorPicker {
     return this._options;
   }
 
+  public get target(): HTMLElement | null {
+    return this._dom.target;
+  }
+
   isOpen() {
     return this._isOpen;
   }
 
   open() {
+    this._isOpen = true;
     this._prevColor = this.getHEX();
     if (this._options.container) {
       this._attachToContainer(true);
     } else {
       this._attachToBody();
     }
+    this._dom.overlayWrapper.classList.add("yk-overlay-wrapper--open");
     this._dom.cursor.focus();
     this._options.onOpen && this._options.onOpen(this);
   }
@@ -203,35 +225,36 @@ export class YKColorPicker {
   updateOptions(options: YKColorPickerOptions) {
     const _options = YKColorPicker._buildOptions(this._options, options);
     this._options = _options;
-    const { target, representation } = this._options;
 
-    // update representation
-    if (representation && this._currentRepresentation != representation) {
-      this._updateRepresentation(representation);
+    if (options.hasOwnProperty("theme")) {
+      this._updateTheme(_options.theme);
     }
 
-    // update target
-    if (this._dom.target != target) {
-      if (this._dom.target != null) {
-        this._dom.target.removeEventListener("click", this._onClickTargetBind);
-      }
-      this._dom.target = target;
-      if (this._dom.target != null) {
-        this._dom.attachEvent(target, "click", this._onClickTargetBind);
-      }
+    if (options.hasOwnProperty("representation")) {
+      this._updateRepresentation(_options.representation);
     }
 
-    if (this._isOpen) {
-      if (options.hasOwnProperty("container")) {
-        if (options.container) {
-          this._attachToContainer(true);
-        } else {
-          this._attachToBody();
-        }
+    // Update position only when container is not defined, since it will be updated if attacToBody invoked.
+    if (
+      options.hasOwnProperty("position") &&
+      options.hasOwnProperty("container") == false
+    ) {
+      this._updatePosition();
+    }
+
+    if (options.hasOwnProperty("container")) {
+      if (options.container) {
+        this._attachToContainer(true);
+      } else {
+        this._attachToBody();
       }
     }
 
-    if (options.color) {
+    if (options.hasOwnProperty("target")) {
+      this._updateTarget(options.target);
+    }
+
+    if (options.hasOwnProperty("color") && options.color) {
       this.setColor(options.color);
     }
   }
@@ -392,8 +415,12 @@ export class YKColorPicker {
 
   private _buildHEXInput() {
     const inputWrapper = createElement("div", ["yk-hex-input"]);
-    const inputHEX = createElement("input", ["yk-color-input"]);
-    const labelHEX = createElement("label", ["yk-color-model-label"]);
+    const inputHEX = createElement("input", ["yk-color-input"], {
+      id: "yk-color-input-hex",
+    });
+    const labelHEX = createElement("label", ["yk-color-model-label"], {
+      for: "yk-color-input-hex",
+    });
     inputHEX.setAttribute("type", "text");
     labelHEX.textContent = "HEX";
     inputWrapper.appendChild(inputHEX);
@@ -638,7 +665,7 @@ export class YKColorPicker {
     // Create elements
     const sliderWrapper = createElement("div", ["yk-hue-slider-wrapper"]);
     const slider = createElement("div", ["yk-hue-slider"]);
-    const sliderThumb = createElement("a", ["yk-hue-slider-thumb"]);
+    const sliderThumb = createElement("div", ["yk-hue-slider-thumb"]);
     sliderThumb.setAttribute("tabindex", "0");
 
     // Appench child element
@@ -662,7 +689,7 @@ export class YKColorPicker {
     // Create elements
     const sliderWrapper = createElement("div", ["yk-opacity-slider-wrapper"]);
     const color = createElement("div", ["yk-opacity-color"]);
-    const sliderThumb = createElement("a", ["yk-opacity-slider-thumb"]);
+    const sliderThumb = createElement("div", ["yk-opacity-slider-thumb"]);
     sliderThumb.setAttribute("tabindex", "0");
 
     // Appench child element
@@ -788,10 +815,10 @@ export class YKColorPicker {
   }
 
   private _updatePosition() {
-    if (this._options.target == null) {
+    if (this._dom.target == null) {
       return;
     }
-    if (!YKColorPicker._isTargetInViewport(this._options.target)) {
+    if (!YKColorPicker._isTargetInViewport(this._dom.target)) {
       this.close();
       return;
     }
@@ -805,7 +832,10 @@ export class YKColorPicker {
     let _container: HTMLElement | null = null;
     if (typeof this._options.container == "string") {
       _container = document.querySelector(this._options.container);
-    } else {
+    } else if (
+      this._options.container &&
+      this._options.container.nodeType == Node.ELEMENT_NODE
+    ) {
       _container = this._options.container;
     }
     if (!_container) {
@@ -817,15 +847,9 @@ export class YKColorPicker {
     const { overlayWrapper } = this._dom;
     const parent = overlayWrapper.parentElement;
     _container.appendChild(overlayWrapper);
-    overlayWrapper.className = "";
-    overlayWrapper.classList.add(
-      "yk-overlay-wrapper",
-      "yk-overlay-wrapper--static",
-      "yk-overlay-wrapper--open",
-      "yk-overlay-wrapper--" + this._options.theme
-    );
+    overlayWrapper.classList.add("yk-overlay-wrapper--static");
+    this._updateTheme(this._options.theme);
     this._updateGUI();
-    this._isOpen = true;
     if (callEvent && parent != overlayWrapper.parentElement) {
       this._options.onContainerChange &&
         this._options.onContainerChange(this, parent);
@@ -837,19 +861,14 @@ export class YKColorPicker {
     const { overlayWrapper } = this._dom;
     const parent = overlayWrapper.parentElement;
     document.body.appendChild(overlayWrapper);
-    overlayWrapper.className = "";
-    overlayWrapper.classList.add(
-      "yk-overlay-wrapper",
-      "yk-overlay-wrapper--open",
-      "yk-overlay-wrapper--" + this._options.theme
-    );
+    overlayWrapper.classList.remove("yk-overlay-wrapper--static");
+    this._updateTheme(this._options.theme);
     this._updateGUI();
     this._updatePosition();
     attachEvent(window, "resize", this._onResizeScrollWindowBind);
     attachEvent(window, "scroll", this._onResizeScrollWindowBind);
     attachEvent(document, "click", this._onClickCloseBind);
     attachEvent(document, "keyup", this._onKeyUpCloseBind);
-    this._isOpen = true;
     if (parent != overlayWrapper.parentElement) {
       this._options.onContainerChange &&
         this._options.onContainerChange(this, parent);
@@ -860,7 +879,7 @@ export class YKColorPicker {
     this._dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open");
     this._removeWindowEvents();
     this._isOpen = false;
-    this._options.target?.focus();
+    this._dom.target?.focus();
   }
 
   private _onKeydownCursor(event: KeyboardEvent) {
@@ -1906,12 +1925,13 @@ export class YKColorPicker {
 
   private _onResizeScrollWindow(event: Event) {
     const { type } = event;
-    const { target, closeOnScroll, closeOnResize } = this._options;
+    const { target } = this._dom;
 
     if (target == null) {
       return;
     }
 
+    const { closeOnScroll, closeOnResize } = this._options;
     if (
       (type == "scroll" && closeOnScroll) ||
       (type == "resize" && closeOnResize)
@@ -1991,7 +2011,8 @@ export class YKColorPicker {
   }
 
   private _getPositionAxis(): Point {
-    const { target, position, positionFallback } = this._options;
+    const { position, positionFallback } = this._options;
+    const { target } = this._dom;
     if (!target || !position || !positionFallback) {
       return { x: 0, y: 0 };
     }
@@ -2128,6 +2149,47 @@ export class YKColorPicker {
     if (this._options.onRepresentationChange) {
       this._options.onRepresentationChange(this);
     }
+  }
+
+  private _updateTheme(theme: "light" | "dark") {
+    this._dom.overlayWrapper.classList.remove(
+      "yk-overlay-wrapper--light",
+      "yk-overlay-wrapper--dark"
+    );
+
+    if (theme !== "light" && theme !== "dark") {
+      throw new Error("YKColorPicker:: Theme must be light or dark");
+    }
+
+    this._dom.overlayWrapper.classList.add(`yk-overlay-wrapper--${theme}`);
+  }
+
+  private _updateTarget(target: HTMLElement | string | undefined | null) {
+    let _target: HTMLElement | null = null;
+    if (typeof target == "string") {
+      _target = document.querySelector(target);
+    } else if (target && target.nodeType == Node.ELEMENT_NODE) {
+      _target = target;
+    } else if (target !== null && target !== undefined) {
+      throw new Error(
+        "YKColorPicker:: target must be a string or an HTMLElement"
+      );
+    }
+
+    const prevTarget = this._dom.target;
+
+    if (prevTarget != null) {
+      prevTarget.removeEventListener("click", this._onClickTargetBind);
+    }
+    this._dom["target"] = _target;
+
+    if (this._dom.target != null) {
+      attachEvent(this._dom.target, "click", this._onClickTargetBind);
+    }
+
+    this._updatePosition();
+
+    this._options.onTargetChange(this, prevTarget);
   }
 
   private static _isTargetInViewport(target: HTMLElement | undefined) {

@@ -1,3 +1,43 @@
+:root {
+  --yk-box-shadow-color: rgba(0, 0, 0, 0.2);
+  --yk-border-color: thin solid white;
+  --yk-box-shadow: 0 0 0 1px black;
+  --yk-slider-box-shadow: 0px 0px 6px #777;
+  --yk-hue-gradient: linear-gradient(
+    90deg,
+    red,
+    #ff0,
+    #0f0,
+    #0ff,
+    #00f,
+    #f0f,
+    red
+  );
+  --yk-opacity-gradient: linear-gradient(90deg, transparent, red);
+  --yk-light-bg-color: #f7f7f7;
+  --yk-light-thumb-bg-color: #fff;
+  --yk-light-thumb-focus-outline: #383838;
+  --yk-light-input-bg-color: #fcfcfc;
+  --yk-light-input-text-color: #3b3b3b;
+  --yk-light-input-border-color: #d6d6d6;
+  --yk-light-input-focus-border-color: #467dff;
+  --yk-light-label-color: #3b3b3b;
+  --yk-light-preview-stroke: #c8c8c8;
+  --yk-light-icon-fill: #696969;
+  --yk-light-icon-hover-bg-color: #dfdfdf;
+  --yk-dark-bg-color: #383838;
+  --yk-dark-thumb-bg-color: #323232;
+  --yk-dark-thumb-focus-outline: #fff;
+  --yk-dark-input-bg-color: #383838;
+  --yk-dark-input-text-color: #d6d6d6;
+  --yk-dark-input-border-color: #5a5a5a;
+  --yk-dark-input-focus-border-color: #0e639c;
+  --yk-dark-label-color: #d6d6d6;
+  --yk-dark-preview-stroke: gray;
+  --yk-dark-icon-fill: #bcbcbc;
+  --yk-dark-icon-hover-bg-color: #4e4e4e;
+}
+
 .yk-overlay-wrapper {
   touch-action: none;
   position: fixed;
@@ -21,7 +61,7 @@
 }
 
 .yk-wrapper {
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 10px;
+  box-shadow: var(--yk-box-shadow-color) 0px 4px 10px;
   display: inline-block;
   width: 280px;
   position: relative;
@@ -51,8 +91,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: thin solid white;
-  box-shadow: 0 0 0 1px black;
+  border: var(--yk-border-color);
+  box-shadow: var(--yk-box-shadow);
 }
 
 .yk-color-settings {
@@ -90,19 +130,10 @@
   width: 100%;
   height: 10px;
   border-radius: 2px;
-  background-image: linear-gradient(
-    90deg,
-    red,
-    #ff0,
-    #0f0,
-    #0ff,
-    #00f,
-    #f0f,
-    red
-  );
+  background-image: var(--yk-hue-gradient);
 }
 .yk-opacity-color {
-  background-image: linear-gradient(90deg, transparent, red);
+  background-image: var(--yk-opacity-gradient);
   position: absolute;
   width: 100%;
   height: 100%;
@@ -115,7 +146,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50px;
-  box-shadow: 0px 0px 6px #777;
+  box-shadow: var(--yk-slider-box-shadow);
   top: 50%;
   transform: translate(-8px, -50%);
   outline: none;
@@ -216,33 +247,33 @@
 
 /* Light theme */
 .yk-overlay-wrapper--light .yk-wrapper {
-  background-color: #f7f7f7;
+  background-color: var(--yk-light-bg-color);
 }
 .yk-overlay-wrapper--light
   :where(.yk-hue-slider-thumb, .yk-opacity-slider-thumb) {
-  background-color: #fff;
+  background-color: var(--yk-light-thumb-bg-color);
 }
 .yk-overlay-wrapper--light .yk-hue-slider-thumb:focus,
 .yk-overlay-wrapper--light .yk-opacity-slider-thumb:focus {
-  outline-color: #383838;
+  outline-color: var(--yk-light-thumb-focus-outline);
 }
 .yk-overlay-wrapper--light .yk-color-input {
-  background-color: #fcfcfc;
-  color: #3b3b3b;
-  border-color: #d6d6d6;
+  background-color: var(--yk-light-input-bg-color);
+  color: var(--yk-light-input-text-color);
+  border-color: var(--yk-light-input-border-color);
 }
 .yk-overlay-wrapper--light .yk-color-input:focus {
-  border-color: #467dff;
+  border-color: var(--yk-light-input-focus-border-color);
 }
 .yk-overlay-wrapper--light .yk-color-model-label {
-  color: #3b3b3b;
+  color: var(--yk-light-label-color);
 }
 .yk-overlay-wrapper--light .yk-preview-stroke {
-  stroke: #c8c8c8;
+  stroke: var(--yk-light-preview-stroke);
 }
 .yk-overlay-wrapper--light
   :where(.yk-clipboard-color svg, .yk-color-model-switch svg) {
-  fill: #696969;
+  fill: var(--yk-light-icon-fill);
 }
 .yk-overlay-wrapper--light
   :where(
@@ -251,38 +282,38 @@
     .yk-color-model-switch:hover,
     .yk-color-model-switch:focus
   ) {
-  background-color: #dfdfdf;
+  background-color: var(--yk-light-icon-hover-bg-color);
 }
 
 /* Dark theme */
 .yk-overlay-wrapper--dark .yk-wrapper {
-  background-color: #383838;
+  background-color: var(--yk-dark-bg-color);
 }
 .yk-overlay-wrapper--dark
   :where(.yk-hue-slider-thumb, .yk-opacity-slider-thumb) {
-  background-color: #323232;
+  background-color: var(--yk-dark-thumb-bg-color);
 }
 .yk-overlay-wrapper--dark .yk-hue-slider-thumb:focus,
 .yk-overlay-wrapper--dark .yk-opacity-slider-thumb:focus {
-  outline-color: #fff;
+  outline-color: var(--yk-dark-thumb-focus-outline);
 }
 .yk-overlay-wrapper--dark .yk-color-input {
-  background-color: #383838;
-  color: #d6d6d6;
-  border-color: #5a5a5a;
+  background-color: var(--yk-dark-input-bg-color);
+  color: var(--yk-dark-input-text-color);
+  border-color: var(--yk-dark-input-border-color);
 }
 .yk-overlay-wrapper--dark .yk-color-input:focus {
-  border-color: #0e639c;
+  border-color: var(--yk-dark-input-focus-border-color);
 }
 .yk-overlay-wrapper--dark .yk-color-model-label {
-  color: #d6d6d6;
+  color: var(--yk-dark-label-color);
 }
 .yk-overlay-wrapper--dark .yk-preview-stroke {
-  stroke: gray;
+  stroke: var(--yk-dark-preview-stroke);
 }
 .yk-overlay-wrapper--dark
   :where(.yk-clipboard-color svg, .yk-color-model-switch svg) {
-  fill: #bcbcbc;
+  fill: var(--yk-dark-icon-fill);
 }
 .yk-overlay-wrapper--dark
   :where(
@@ -291,5 +322,5 @@
     .yk-color-model-switch:hover,
     .yk-color-model-switch:focus
   ) {
-  background-color: #4e4e4e;
+  background-color: var(--yk-dark-icon-hover-bg-color);
 }
