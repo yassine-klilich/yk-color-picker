@@ -1,92 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-	
-	<link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YKColorPicker Demo</title>
 
-</head>
-<body>
-   
-   <!-- <div class="color-picker">
-   	<div class="cp-wrapper">
-			<div class="cp-palette-wrapper">
-				<div class="cp-palette"></div>
-				<div class="cp-cursor"></div>
-			</div>
-			<div class="cp-color-setting">
-				<div class="cp-color-preview-wrapper">
-					<div class="cp-color-preview"></div>
-				</div>
-				<div class="cp-sliders">
-					<div class="cp-hue-slider-wrapper">
-						<div class="cp-hue-slider"></div>
-						<div class="cp-hue-slider-thumb"></div>
-					</div>
-					<div class="cp-opacity-slider-wrapper">
-						<div class="cp-opacity-slider">
-							<div class="cp-opacity-color"></div>
-						</div>
-						<div class="cp-opacity-slider-thumb"></div>
-					</div>
-				</div>
-				<div class="cp-color-model-wrapper">
-					<div class="cp-color-model">
-						<div class="cp-rgb-input">
-							<input type="text" class="cp-color-input">
-							<input type="text" class="cp-color-input">
-							<input type="text" class="cp-color-input">
-							<input type="text" class="cp-color-input">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020/style.css"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020/yk-color-picker.js"></script>
 
-							<label class="cp-color-model-label">R</label>
-							<label class="cp-color-model-label">G</label>
-							<label class="cp-color-model-label">B</label>
-							<label class="cp-color-model-label">A</label>
-						</div>
-					</div>
-					
-					<div class="cp-color-model">
-						<div class="cp-hsl-input">
-							<input type="text" class="cp-color-input">
-							<input type="text" class="cp-color-input">
-							<input type="text" class="cp-color-input">
-							<input type="text" class="cp-color-input">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        background: #f4f4f4;
+        color: #333;
+      }
+      .color-picker-container {
+        width: 300px;
+        margin: 20px auto;
+        padding: 20px;
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      #color-display {
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
+        margin: 10px auto;
+        border: 1px solid #ccc;
+        background: #ff0000;
+      }
+      .color-info {
+        margin-top: 10px;
+        font-size: 16px;
+      }
+      .btn {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        font-size: 14px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>YKColorPicker Demo</h1>
+    <div class="color-picker-container">
+      <div id="color-display"></div>
+      <div class="color-info">
+        <p><strong>HEX:</strong> <span id="hex-value">#ff0000</span></p>
+        <p><strong>RGB:</strong> <span id="rgb-value">rgb(255, 0, 0)</span></p>
+        <p>
+          <strong>HSL:</strong> <span id="hsl-value">hsl(0, 100%, 50%)</span>
+        </p>
+      </div>
+      <button id="color-picker-trigger" class="btn">Pick a Color</button>
+    </div>
 
-							<label class="cp-color-model-label">H</label>
-							<label class="cp-color-model-label">S</label>
-							<label class="cp-color-model-label">L</label>
-							<label class="cp-color-model-label">A</label>
-						</div>
-					</div>
-					
-					<div class="cp-color-model">
-						<div class="cp-hex-input">
-							<input type="text" class="cp-color-input">
+    <script>
+      const colorDisplay = document.getElementById("color-display");
+      const hexValue = document.getElementById("hex-value");
+      const rgbValue = document.getElementById("rgb-value");
+      const hslValue = document.getElementById("hsl-value");
 
-							<label class="cp-color-model-label">HEX</label>
-						</div>
-					</div>
+      window.colorPicker = new YK.YKColorPicker({
+        target: document.getElementById("color-picker-trigger"),
+        color: "#ff0000",
+        onInput: (instance) => {
+          const hex = instance.getHEX();
+          const rgb = instance.getRGB();
+          const hsl = instance.getHSL();
 
-					<span class="cp-color-model-arrow"><svg width="12" height="12" viewBox="-285 408.9 24 24"><path d="M-285,417l4-4.1l8,8l8-8l4,4.1l-12,11.9L-285,417z"/></svg></span>
-					<div class="cp-select-color-model" style="display: none;">
-						<span class="cp-select-color-model-option" data-value="0">RGB</span>
-						<span class="cp-select-color-model-option" data-value="1">HSL</span>
-						<span class="cp-select-color-model-option" data-value="2">HEX</span>
-					</div>
-				</div>
-			</div>
-   	</div>
-	</div> -->
-	
-	<span id="colorHSL" style="color: red;">hhhh</span>
-
-	<script src="./script.js"></script>
-
-   <script>
-      ColorPicker.init();
-   </script>
-
-</body>
+          colorDisplay.style.backgroundColor = hex;
+          hexValue.textContent = hex;
+          rgbValue.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+          hslValue.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+        },
+      });
+    </script>
+  </body>
 </html>
