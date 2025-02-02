@@ -3,104 +3,91 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YKColorPicker</title>
+    <title>YKColorPicker Demo</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020/style.css"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020/yk-color-picker.js"></script>
 
     <style>
-      .color-box {
-        position: relative;
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border-radius: 2px;
-        background-color: darkgoldenrod;
-        box-shadow: 0 0 4px #b0b0b0;
-        cursor: pointer;
-        outline-offset: 4px;
-        border: none;
-        padding: 0px;
-        margin: 0;
-
-        top: 550px;
-        left: 200px;
-      }
       body {
-        height: 3000px;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        background: #f4f4f4;
+        color: #333;
+      }
+      .color-picker-container {
+        width: 300px;
+        margin: 20px auto;
+        padding: 20px;
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      #color-display {
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
+        margin: 10px auto;
+        border: 1px solid #ccc;
+        background: #ff0000;
+      }
+      .color-info {
+        margin-top: 10px;
+        font-size: 16px;
+      }
+      .btn {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        font-size: 14px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #0056b3;
       }
     </style>
   </head>
   <body>
-    <button>AAA</button>
+    <h1>YKColorPicker Demo</h1>
+    <div class="color-picker-container">
+      <div id="color-display"></div>
+      <div class="color-info">
+        <p><strong>HEX:</strong> <span id="hex-value">#ff0000</span></p>
+        <p><strong>RGB:</strong> <span id="rgb-value">rgb(255, 0, 0)</span></p>
+        <p>
+          <strong>HSL:</strong> <span id="hsl-value">hsl(0, 100%, 50%)</span>
+        </p>
+      </div>
+      <button id="color-picker-trigger" class="btn">Pick a Color</button>
+    </div>
 
-    <button id="colorBox" class="color-box"></button>
+    <script>
+      const colorDisplay = document.getElementById("color-display");
+      const hexValue = document.getElementById("hex-value");
+      const rgbValue = document.getElementById("rgb-value");
+      const hslValue = document.getElementById("hsl-value");
 
-    <button id="colorBox2" class="color-box" style="margin-left: 20px"></button>
+      window.colorPicker = new YK.YKColorPicker({
+        target: document.getElementById("color-picker-trigger"),
+        color: "#ff0000",
+        onInput: (instance) => {
+          const hex = instance.getHEX();
+          const rgb = instance.getRGB();
+          const hsl = instance.getHSL();
 
-    <div id="container"></div>
-    <div id="container-2"></div>
-
-    <script type="module">
-      import { YKColorPicker, YKColorPickerPosition } from "yk-color-picker";
-
-      window.colorPicker = new YKColorPicker({
-        target: document.getElementById("colorBox"),
-        // container: "container",
-        onInit: function (instance) {
-          console.log("on init", instance);
-          colorBox.style.backgroundColor = instance.getHEX();
+          colorDisplay.style.backgroundColor = hex;
+          hexValue.textContent = hex;
+          rgbValue.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+          hslValue.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
         },
-        onOpen: function (instance) {
-          console.log("on open", instance);
-        },
-        onClose: function (instance) {
-          console.log("on close");
-        },
-        onCopy: function (instance) {
-          console.log("on copy");
-        },
-        onRepresentationChange: function (instance) {
-          console.log("on representation change", instance);
-        },
-        onInput: function (instance) {
-          console.log("on input", instance);
-          instance.target.style.backgroundColor = instance.getHEX();
-        },
-        onChange: function (instance) {
-          console.log("on change", instance);
-        },
-        onTargetChange: function (instance, prevTarget) {
-          console.log("on target change", instance, prevTarget);
-        },
-        onContainerChange: function (instance, prevContainer) {
-          console.log("on container change", instance, prevContainer);
-        },
-        position: YKColorPickerPosition.BOTTOM,
-        color: "brown",
-        theme: "dark",
-        closeOnScroll: false,
-        closeOnResize: false,
       });
-
-      //color: {
-      //  r: 127,
-      //  g: 30,
-      //  b: 190,
-      //  a: 0.8
-      //},
-      //console.log("on input", this.getRGB())
-      //console.log("on input", this.getHSV())
-      //console.log("on input", this.getHSL())
-      //console.log("on input", this.getHEX())
-      //color: "antiquewhite"
-      // color: "#FF0000",
-      // color: "rgba(120 4 64 .15)"
-      //color: "rgb(151 145 37)"
-      // color: "  rgb(19   4   64    1.0   )   "
-      // color: "  rgb(19   4   64    0.7   )   "
-      // color: "  rgb(19   4   64       )   "
-      // color: "  rgb(19   4   641.    )   " -- expect an error
-      // color: "  rgba(   120   4   64    1.0   )   "
-      // color: "  rgba(   255   255   255    0.958   )   "
-      // color: "  rgba(   255   255   255 0.958   )   "
     </script>
   </body>
 </html>
