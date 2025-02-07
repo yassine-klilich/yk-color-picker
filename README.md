@@ -48,7 +48,13 @@ npm install yk-color-picker
 
 ## [Usage](#usage)
 
-Simply import `YKColorPicker` class and apply it:
+In your CSS file, import the YKColorPicker styles:
+
+```css
+@import url("../node_modules/yk-color-picker/dist/esm2020/style.css");
+```
+
+Then import `YKColorPicker` class and initialize the color picker:
 
 ```javascript
 import { YKColorPicker } from "yk-color-picker";
