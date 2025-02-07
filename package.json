@@ -1,6 +1,6 @@
 {
   "name": "yk-color-picker",
-  "version": "1.0.0-alpha",
+  "version": "1.0.1-alpha",
   "description": "YKColorPicker is a lightweight and flexible color picker library designed with a strong focus on user experience (UX), including full keyboard interaction support. It provides a seamless way to integrate a customizable color picker into your project, offering various color models such as RGB, HSV, HSL, and HEX.",
   "main": "dist/umd2020/yk-color-picker.js",
   "module": "dist/esm2020/yk-color-picker.js",
