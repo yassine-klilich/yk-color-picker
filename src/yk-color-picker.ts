@@ -236,7 +236,8 @@ export class YKColorPicker {
 
     // Update position only when container is not defined, since it will be updated if attacToBody invoked.
     if (
-      options.hasOwnProperty("position") &&
+      (options.hasOwnProperty("position") ||
+        options.hasOwnProperty("positionFallback")) &&
       options.hasOwnProperty("container") == false
     ) {
       this._updatePosition();
@@ -2013,9 +2014,22 @@ export class YKColorPicker {
   private _getPositionAxis(): Point {
     const { position, positionFallback } = this._options;
     const { target } = this._dom;
-    if (!target || !position || !positionFallback) {
+    if (!target || !position) {
       return { x: 0, y: 0 };
     }
+
+    const _positionFallback =
+      positionFallback || YKColorPicker.DEFAULT_OPTIONS.positionFallback;
+
+    if (
+      !/^[btlr]+$/.test(_positionFallback) ||
+      /(.).*\1/.test(_positionFallback)
+    ) {
+      throw new Error(
+        "YKColorPicker:: Invalid positionFallback value. It must only contain the characters 'b' (bottom), 't' (top), 'l' (left), and 'r' (right) without any repetition. Examples of a valid value: 'btrl', 'lr', or just one character for example 'b' to force at one position."
+      );
+    }
+
     const targetRect = target.getBoundingClientRect();
     const colorPickerRect = this._dom.overlayWrapper.getBoundingClientRect();
     const scrollTop = document.documentElement.scrollTop;
@@ -2056,8 +2070,8 @@ export class YKColorPicker {
     };
     let positions = "";
 
-    for (let i = 0; i < positionFallback.length; i++) {
-      positions += positionFallback[i] + states[positionFallback[i]];
+    for (let i = 0; i < _positionFallback.length; i++) {
+      positions += _positionFallback[i] + states[_positionFallback[i]];
     }
 
     let bestPositions = "";

@@ -3,13 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YKColorPicker Demo</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020/style.css"
-    />
-    <script src="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020/yk-color-picker.js"></script>
+    <title>Yassine KLILICH - YKColorPicker Demo</title>
 
     <style>
       * {
@@ -244,7 +238,9 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
+      import { YKColorPicker, YKColorPickerPosition } from "yk-color-picker";
+
       optionsForm.addEventListener("click", (e) => {
         e.stopPropagation();
       });
@@ -255,7 +251,7 @@
       const hsvValue = document.getElementById("hsv-value");
       const hslValue = document.getElementById("hsl-value");
 
-      window.colorPicker = new YK.YKColorPicker({
+      window.colorPicker = new YKColorPicker({
         target: document.getElementById("color-picker-trigger"),
         color: "#ff0000",
         onInput: (instance) => {
