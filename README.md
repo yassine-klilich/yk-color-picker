@@ -1,8 +1,12 @@
 # YKColorPicker
 
-[![Generic badge](https://img.shields.io/badge/npm%20package-v1.0.0%2D%2Dalpha-3FB911.svg)](https://www.npmjs.com/package/ngx-interpolation)
+[![Generic badge](https://img.shields.io/badge/npm%20package-v1.1.0%2D%2Dalpha-3FB911.svg)](https://www.npmjs.com/package/ngx-interpolation)
 
 YKColorPicker is a flexible color picker library designed with a strong focus on user experience (UX), including full keyboard interaction support. It provides a seamless way to integrate a customizable color picker into your project, offering various color models such as RGB, HSV, HSL, and HEX.
+
+## Live Demo
+
+Check out the live demo [here](https://yassine-klilich.github.io/yk-color-picker/).
 
 ## Table of Contents
 
@@ -48,7 +52,13 @@ npm install yk-color-picker
 
 ## [Usage](#usage)
 
-Simply import `YKColorPicker` class and apply it:
+In your CSS file, import the YKColorPicker styles:
+
+```css
+@import url("../node_modules/yk-color-picker/dist/esm2020/style.css");
+```
+
+Then import `YKColorPicker` class and initialize the color picker:
 
 ```javascript
 import { YKColorPicker } from "yk-color-picker";
