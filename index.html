@@ -1,332 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YKColorPicker Demo</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020-1.1.0-alpha/style.css"
-    />
-    <script src="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020-1.1.0-alpha/yk-color-picker.js"></script>
-
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: Arial, sans-serif;
-        color: #333;
-        margin: 0;
-      }
-      .color-picker-container {
-        display: flex;
-        flex-direction: column;
-        margin: 0 auto;
-      }
-      #color-display {
-        width: 100px;
-        height: 100px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        align-self: center;
-      }
-      .color-info {
-        margin-top: 10px;
-        font-size: 16px;
-      }
-      .btn {
-        background: #007bff;
-        color: #fff;
-        border: none;
-        padding: 10px 15px;
-        font-size: 14px;
-        border-radius: 3px;
-        cursor: pointer;
-        align-self: center;
-      }
-      .btn:hover {
-        background: #0056b3;
-      }
-
-      .options-panel {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        height: 100vh;
-        height: 100dvh;
-      }
-
-      .form-group {
-        border-right: 1px solid #ddd;
-        background: #f4f4f4;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        row-gap: 20px;
-        height: 100%;
-        overflow: auto;
-      }
-
-      .form-control {
-        display: flex;
-        flex-direction: column;
-        row-gap: 4px;
-      }
-
-      input:is([type="radio"], [type="checkbox"]) {
-        width: 16px;
-        height: 16px;
-      }
-
-      .info-icon {
-        cursor: help;
-
-        svg {
-          pointer-events: none;
-        }
-      }
-
-      .flex {
-        display: flex;
-      }
-      .column-gap-6 {
-        column-gap: 6px;
-      }
-      .align-center {
-        align-items: center;
-      }
-      .line-height-0 {
-        line-height: 0;
-      }
-
-      input[type="text"],
-      select {
-        height: 22px;
-        padding: 0 4px;
-        line-height: 0;
-      }
-
-      select {
-        padding: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="options-panel">
-      <div class="form-group" id="optionsForm">
-        <h3 style="margin: 0">Options</h3>
-
-        <!-- input for color option -->
-        <div class="form-control">
-          <label>Color</label>
-          <input id="colorInput" type="text" value="#ff0000" />
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>YKColorPicker Demo</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020-1.1.0-alpha/style.css" />
+        <script src="https://cdn.jsdelivr.net/gh/yassine-klilich/yk-color-picker@develop/dist/umd2020-1.1.0-alpha/yk-color-picker.js"></script>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                font-family: Arial, sans-serif;
+                color: #333;
+                margin: 0;
+            }
+            .color-picker-container {
+                display: flex;
+                flex-direction: column;
+                margin: 0 auto;
+            }
+            #color-display {
+                width: 100px;
+                height: 100px;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                align-self: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                &:hover #btnCopyColor {
+                    display: block;
+                }
+            }
+            #btnCopyColor {
+                position: absolute;
+                inset: 0;
+                background: hsl(0deg 0% 0% / 20%);
+                border: none;
+                outline: none;
+                margin: 0;
+                padding: 0;
+                display: none;
+                cursor: pointer;
+                border-radius: 6px;
+            }
+            #copiedTooltip {
+                display: none;
+                position: absolute;
+                top: calc(100% + 2px);
+                left: 50%;
+                transform: translateX(-50%);
+                background: hsl(0deg 0% 0% / 80%);
+                color: #fff;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            .color-info {
+                margin-top: 10px;
+                font-size: 16px;
+            }
+            .btn {
+                background: #007bff;
+                color: #fff;
+                border: none;
+                padding: 10px 15px;
+                font-size: 14px;
+                border-radius: 3px;
+                cursor: pointer;
+                align-self: center;
+            }
+            .btn:hover {
+                background: #0056b3;
+            }
+            .options-panel {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                height: 100vh;
+                height: 100dvh;
+            }
+            .form-group {
+                border-right: 1px solid #ddd;
+                background: #f4f4f4;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                row-gap: 20px;
+                height: 100%;
+                overflow: auto;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+            .form-control {
+                display: flex;
+                flex-direction: column;
+                row-gap: 4px;
+            }
+            input:is([type="radio"], [type="checkbox"]) {
+                width: 16px;
+                height: 16px;
+            }
+            .info-icon {
+                cursor: help;
+                svg {
+                    pointer-events: none;
+                }
+            }
+            .flex {
+                display: flex;
+            }
+            .column-gap-6 {
+                column-gap: 6px;
+            }
+            .align-center {
+                align-items: center;
+            }
+            .line-height-0 {
+                line-height: 0;
+            }
+            input[type="text"],
+            select {
+                height: 22px;
+                padding: 0 4px;
+                line-height: 0;
+            }
+            select {
+                padding: 0;
+            }
+            .toggle-btn {
+                display: none;
+            }
+            @media (max-width: 790px) {
+                .options-panel {
+                    grid-template-columns: 1fr;
+                    position: relative;
+                }
+                .form-group {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    transform: translateX(-100%);
+                    opacity: 0;
+                    z-index: -1;
+                }
+                .form-group.open {
+                    transform: translateX(0);
+                    opacity: 1;
+                    z-index: 100;
+                }
+                .toggle-btn {
+                    display: block;
+                    margin: 10px;
+                }
+            }
+            .anchor-links {
+                position: fixed;
+                top: 14px;
+                right: 20px;
+                display: flex;
+                align-items: center;
+                column-gap: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="toggle-options" class="toggle-btn btn">Toggle Options</button>
+        <div class="options-panel">
+            <div class="form-group" id="optionsForm">
+                <h3 style="margin: 0;">Options</h3>
+                <!-- input for color option -->
+                <div class="form-control">
+                    <label>Color</label>
+                    <input id="colorInput" type="text" value="#ff0000" />
+                </div>
+                <div class="form-control">
+                    <label>Position</label>
+                    <select id="position">
+                        <option value="t">Top</option>
+                        <option selected value="b">Bottom</option>
+                        <option value="l">Left</option>
+                        <option value="r">Right</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label>Position fallback</label>
+                    <div class="flex align-center column-gap-6">
+                        <input id="position-fallback" value="btrl" type="text" style="flex-grow: 1;" />
+                        <i
+                            class="info-icon line-height-0"
+                            title="Position Fallback must contain only the characters 'b' (bottom), 't' (top), 'l' (left), and 'r' (right) without any repetition. Examples of a valid value: 'btrl', 'lr', or just one character for example 'b' to force at one position"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" color="#000000" fill="none">
+                                <path d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z" stroke="currentColor" stroke-width="2" />
+                                <path d="M12.2422 17V12C12.2422 11.5286 12.2422 11.2929 12.0957 11.1464C11.9493 11 11.7136 11 11.2422 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M11.992 8H12.001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </i>
+                    </div>
+                </div>
+                <div class="form-control">
+                    <label>Color Format</label>
+                    <select id="color-format">
+                        <option selected value="rgb">RGB</option>
+                        <option value="hex">HEX</option>
+                        <option value="hsv">HSV</option>
+                        <option value="hsl">HSL</option>
+                    </select>
+                </div>
+                <!-- add theme radio button -->
+                <div class="form-control">
+                    <label>Theme</label>
+                    <div class="form-input-wrapper">
+                        <label>
+                            <input type="radio" name="theme" value="light" checked />
+                            Light
+                        </label>
+                        <br />
+                        <label>
+                            <input type="radio" name="theme" value="dark" />
+                            Dark
+                        </label>
+                    </div>
+                </div>
+                <!-- 2 Checkboxes whether to close on scroll and close on resize -->
+                <div class="form-control">
+                    <h4 style="margin: 0; font-weight: 400;">Close on</h4>
+                    <label class="flex align-center column-gap-6">
+                        <input type="checkbox" id="closeOnScroll" checked />
+                        Scroll
+                    </label>
+                    <label class="flex align-center column-gap-6">
+                        <input type="checkbox" id="closeOnResize" />
+                        Resize
+                    </label>
+                </div>
+                <div class="form-control">
+                    <h4 style="margin: 0;">Events</h4>
+                    <ul style="margin: 0;">
+                        <li>onInit</li>
+                        <li>onOpen</li>
+                        <li>onClose</li>
+                        <li>onInput</li>
+                        <li>onChange</li>
+                        <li>onCopy</li>
+                        <li>onRepresentationChange</li>
+                        <li>onTargetChange</li>
+                        <li>onContainerChange</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="color-picker-container">
+                <h1>YKColorPicker Demo</h1>
+                <div id="color-display">
+                    <button id="btnCopyColor" type="button">
+                        <svg viewBox="0 0 16 16" width="26px" height="26px">
+                            <path
+                                fill="#fff"
+                                d="m1.9695 11.037v-6.7c0-2 1.6-3.7 3.7-3.7h4.3c0.8 0 1.5 0.5 1.7 1.2h-5.6c-1.6 0.1-2.9 1.4-2.9 3.1v7.9c-0.7-0.3-1.2-1-1.2-1.8zm4.3 4.3c-1 0-1.8-0.8-1.8-1.8v-8.6c0-1 0.8-1.8 1.8-1.8h6.1c1 0 1.8 0.8 1.8 1.8v8.6c0 1-0.8 1.8-1.8 1.8zm6.7-1.8v-8.6c0-0.3-0.3-0.6-0.6-0.6h-6.1c-0.3 0-0.6 0.3-0.6 0.6v8.6c0 0.3 0.3 0.6 0.6 0.6h6.1c0.3 0 0.6-0.3 0.6-0.6z"
+                            ></path>
+                        </svg>
+                    </button>
+                    <span id="copiedTooltip">Copied</span>
+                </div>
+                <div class="color-info">
+                    <p><strong>HEX:</strong> <span id="hex-value"></span></p>
+                    <p><strong>RGB:</strong> <span id="rgb-value"></span></p>
+                    <p><strong>HSV:</strong> <span id="hsv-value"></span></p>
+                    <p><strong>HSL:</strong> <span id="hsl-value"></span></p>
+                </div>
+                <button id="color-picker-trigger" class="btn">Pick a Color</button>
+                <div class="anchor-links">
+                    <a target="_blank" href="https://github.com/yassine-klilich/yk-color-picker" title="Visit Github repository">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 1024 1024" fill="none">
+                            <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"
+                                transform="scale(64)"
+                                fill="#1B1F23"
+                            />
+                        </svg>
+                    </a>
+                </div>
+            </div>
         </div>
+        <script>
+            optionsForm.addEventListener("click", (e) => {
+                e.stopPropagation();
+            });
 
-        <div class="form-control">
-          <label>Position</label>
-          <select id="position">
-            <option value="t">Top</option>
-            <option selected value="b">Bottom</option>
-            <option value="l">Left</option>
-            <option value="r">Right</option>
-          </select>
-        </div>
+            const colorDisplay = document.getElementById("color-display");
+            const hexValue = document.getElementById("hex-value");
+            const rgbValue = document.getElementById("rgb-value");
+            const hsvValue = document.getElementById("hsv-value");
+            const hslValue = document.getElementById("hsl-value");
 
-        <div class="form-control">
-          <label>Position fallback</label>
-          <div class="flex align-center column-gap-6">
-            <input
-              id="position-fallback"
-              value="btrl"
-              type="text"
-              style="flex-grow: 1"
-            />
-            <i
-              class="info-icon line-height-0"
-              title="Position Fallback must contain only the characters 'b' (bottom), 't' (top), 'l' (left), and 'r' (right) without any repetition. Examples of a valid value: 'btrl', 'lr', or just one character for example 'b' to force at one position"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                color="#000000"
-                fill="none"
-              >
-                <path
-                  d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <path
-                  d="M12.2422 17V12C12.2422 11.5286 12.2422 11.2929 12.0957 11.1464C11.9493 11 11.7136 11 11.2422 11"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M11.992 8H12.001"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </i>
-          </div>
-        </div>
+            window.colorPicker = new YK.YKColorPicker({
+                target: document.getElementById("color-picker-trigger"),
+                color: "#ff0000",
+                onInput: (instance) => {
+                    const hex = instance.getHEX();
+                    const rgb = instance.getRGB();
+                    const hsl = instance.getHSL();
+                    const hsv = instance.getHSV();
 
-        <div class="form-control">
-          <label>Color Format</label>
-          <select id="color-format">
-            <option selected value="rgb">RGB</option>
-            <option value="hex">HEX</option>
-            <option value="hsv">HSV</option>
-            <option value="hsl">HSL</option>
-          </select>
-        </div>
+                    colorDisplay.style.backgroundColor = hex;
+                    hexValue.textContent = hex;
+                    rgbValue.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+                    hslValue.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+                    hsvValue.textContent = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
+                },
+            });
 
-        <!-- add theme radio button -->
-        <div class="form-control">
-          <label>Theme</label>
-          <div class="form-input-wrapper">
-            <label>
-              <input type="radio" name="theme" value="light" checked />
-              Light
-            </label>
-            <br />
-            <label>
-              <input type="radio" name="theme" value="dark" />
-              Dark
-            </label>
-          </div>
-        </div>
+            document.getElementById("position").addEventListener("change", (e) => {
+                colorPicker.updateOptions({
+                    position: e.target.value,
+                });
+            });
 
-        <!-- 2 Checkboxes whether to close on scroll and close on resize -->
-        <div class="form-control">
-          <h4 style="margin: 0; font-weight: 400">Close on</h4>
-          <label class="flex align-center column-gap-6">
-            <input type="checkbox" id="closeOnScroll" checked />
-            Scroll
-          </label>
-          <label class="flex align-center column-gap-6">
-            <input type="checkbox" id="closeOnResize" />
-            Resize
-          </label>
-        </div>
+            document.getElementById("color-format").addEventListener("change", (e) => {
+                colorPicker.updateOptions({
+                    representation: e.target.value,
+                });
+            });
 
-        <div class="form-control">
-          <h4 style="margin: 0">Events</h4>
-          <ul style="margin: 0">
-            <li>onInit</li>
-            <li>onOpen</li>
-            <li>onClose</li>
-            <li>onInput</li>
-            <li>onChange</li>
-            <li>onCopy</li>
-            <li>onRepresentationChange</li>
-            <li>onTargetChange</li>
-            <li>onContainerChange</li>
-          </ul>
-        </div>
-      </div>
+            document.getElementById("position-fallback").addEventListener("input", (e) => {
+                colorPicker.updateOptions({
+                    positionFallback: e.target.value,
+                });
+            });
 
-      <div class="color-picker-container">
-        <h1>YKColorPicker Demo</h1>
+            document.getElementById("colorInput").addEventListener("input", (e) => {
+                colorPicker.updateOptions({
+                    color: e.target.value,
+                });
+            });
 
-        <div id="color-display"></div>
-        <div class="color-info">
-          <p><strong>HEX:</strong> <span id="hex-value"></span></p>
-          <p><strong>RGB:</strong> <span id="rgb-value"></span></p>
-          <p><strong>HSV:</strong> <span id="hsv-value"></span></p>
-          <p><strong>HSL:</strong> <span id="hsl-value"></span></p>
-        </div>
-        <button id="color-picker-trigger" class="btn">Pick a Color</button>
-      </div>
-    </div>
+            document.querySelectorAll('input[name="theme"]').forEach((input) => {
+                input.addEventListener("change", (e) => {
+                    colorPicker.updateOptions({
+                        theme: e.target.value,
+                    });
+                });
+            });
 
-    <script>
-      optionsForm.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
+            document.getElementById("closeOnScroll").addEventListener("change", (e) => {
+                colorPicker.updateOptions({
+                    closeOnScroll: e.target.checked,
+                });
+            });
 
-      const colorDisplay = document.getElementById("color-display");
-      const hexValue = document.getElementById("hex-value");
-      const rgbValue = document.getElementById("rgb-value");
-      const hsvValue = document.getElementById("hsv-value");
-      const hslValue = document.getElementById("hsl-value");
+            document.getElementById("closeOnResize").addEventListener("change", (e) => {
+                colorPicker.updateOptions({
+                    closeOnResize: e.target.checked,
+                });
+            });
 
-      window.colorPicker = new YK.YKColorPicker({
-        target: document.getElementById("color-picker-trigger"),
-        color: "#ff0000",
-        onInput: (instance) => {
-          const hex = instance.getHEX();
-          const rgb = instance.getRGB();
-          const hsl = instance.getHSL();
-          const hsv = instance.getHSV();
+            document.getElementById("toggle-options").addEventListener("click", function () {
+                document.getElementById("optionsForm").classList.toggle("open");
+            });
 
-          colorDisplay.style.backgroundColor = hex;
-          hexValue.textContent = hex;
-          rgbValue.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-          hslValue.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
-          hsvValue.textContent = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
-        },
-      });
+            document.getElementById("btnCopyColor").addEventListener("click", () => {
+                colorPicker._onClickCopyColor();
+                // show copied tooltip
+                document.getElementById("copiedTooltip").style.display = "block";
+                if (copiedTimeout) clearTimeout(copiedTimeout);
 
-      document.getElementById("position").addEventListener("change", (e) => {
-        colorPicker.updateOptions({
-          position: e.target.value,
-        });
-      });
+                copiedTimeout = setTimeout(() => {
+                    document.getElementById("copiedTooltip").style.display = "none";
+                }, 1000);
+            });
 
-      document
-        .getElementById("color-format")
-        .addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            representation: e.target.value,
-          });
-        });
-
-      document
-        .getElementById("position-fallback")
-        .addEventListener("input", (e) => {
-          colorPicker.updateOptions({
-            positionFallback: e.target.value,
-          });
-        });
-
-      document.getElementById("colorInput").addEventListener("input", (e) => {
-        colorPicker.updateOptions({
-          color: e.target.value,
-        });
-      });
-
-      document.querySelectorAll('input[name="theme"]').forEach((input) => {
-        input.addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            theme: e.target.value,
-          });
-        });
-      });
-
-      document
-        .getElementById("closeOnScroll")
-        .addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            closeOnScroll: e.target.checked,
-          });
-        });
-
-      document
-        .getElementById("closeOnResize")
-        .addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            closeOnResize: e.target.checked,
-          });
-        });
-    </script>
-  </body>
+            let copiedTimeout;
+        </script>
+    </body>
 </html>
