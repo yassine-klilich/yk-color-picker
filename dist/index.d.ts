@@ -1,6 +1,10 @@
 declare interface __YKColorPickerOptions extends Required<YKColorPickerOptions> {
 }
 
+declare type CloseOptions = {
+    preventFocusTarget: boolean;
+};
+
 /**
  * Color Picker
  */
@@ -33,7 +37,7 @@ export declare class YKColorPicker {
     get target(): HTMLElement | null;
     isOpen(): boolean;
     open(): void;
-    close(): void;
+    close(options?: CloseOptions): void;
     getRGB(): {
         a: number;
         r: number;

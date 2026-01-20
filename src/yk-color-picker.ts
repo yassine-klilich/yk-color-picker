@@ -78,6 +78,10 @@ export interface YKColorPickerOptions {
 
 interface __YKColorPickerOptions extends Required<YKColorPickerOptions> {}
 
+type CloseOptions = {
+  preventFocusTarget: boolean
+}
+
 /**
  * Color Picker
  */
@@ -183,12 +187,12 @@ export class YKColorPicker {
     this._options.onOpen && this._options.onOpen(this);
   }
 
-  close() {
+  close(options?: CloseOptions) {
     if (!this._dc) {
       if (this._prevColor != this.getHEX()) {
         this._options.onChange && this._options.onChange(this);
       }
-      this._detachOverlay();
+      this._detachOverlay(options);
       this._options.onClose && this._options.onClose(this);
     }
     this._dc = false;
@@ -876,11 +880,13 @@ export class YKColorPicker {
     }
   }
 
-  private _detachOverlay() {
+  private _detachOverlay(options?: CloseOptions) {
     this._dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open");
     this._removeWindowEvents();
     this._isOpen = false;
-    this._dom.target?.focus();
+    if (options?.preventFocusTarget != true) {
+      this._dom.target?.focus();
+    }
   }
 
   private _onKeydownCursor(event: KeyboardEvent) {
@@ -1940,7 +1946,9 @@ export class YKColorPicker {
       this.close();
     } else {
       if (!YKColorPicker._isTargetInViewport(target)) {
-        this.close();
+        this.close({
+          preventFocusTarget: true
+        });
         return;
       }
       this._setPositionAxis(this._getPositionAxis());
@@ -2212,12 +2220,14 @@ export class YKColorPicker {
     }
 
     const rect = target.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    
     return (
-      rect.top >= 0 &&
-      rect.left >= 0 &&
-      rect.bottom <=
-        (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+      rect.bottom > 0 &&
+      rect.top < viewportHeight &&
+      rect.right > 0 &&
+      rect.left < viewportWidth
     );
   }
 
