@@ -318,7 +318,7 @@ const u = {
     }[n];
   }
 };
-class T {
+class R {
   constructor(t, e, o, i) {
     this.a = i, this.hsv = { h: t, s: e, v: o }, this.rgb = this.toRGB(), this.hsl = this.toHSL(), this.hex = this.toHEX();
   }
@@ -359,7 +359,7 @@ class T {
 var A = /* @__PURE__ */ ((n) => (n.TOP = "t", n.BOTTOM = "b", n.LEFT = "l", n.RIGHT = "r", n))(A || {}), P = /* @__PURE__ */ ((n) => (n.RGB = "rgb", n.HSV = "hsv", n.HSL = "hsl", n.HEX = "hex", n))(P || {});
 const h = class h {
   constructor(t) {
-    this._isOpen = !1, this._options = h.DEFAULT_OPTIONS, this._color = new T(0, 0, 0, 1), this._dom = {}, this._copyTimeout = null, this._prevColor = null, this._targetKeydownOpen = !1, this._options = h._buildOptions(
+    this._isOpen = !1, this._options = h.DEFAULT_OPTIONS, this._color = new R(0, 0, 0, 1), this._dom = {}, this._copyTimeout = null, this._prevColor = null, this._targetKeydownOpen = !1, this._options = h._buildOptions(
       h.DEFAULT_OPTIONS,
       t
     );
@@ -387,8 +387,8 @@ const h = class h {
   open() {
     this._isOpen = !0, this._prevColor = this.getHEX(), this._options.container ? this._attachToContainer(!0) : this._attachToBody(), this._dom.overlayWrapper.classList.add("yk-overlay-wrapper--open"), this._dom.cursor.focus(), this._options.onOpen && this._options.onOpen(this);
   }
-  close() {
-    this._dc || (this._prevColor != this.getHEX() && this._options.onChange && this._options.onChange(this), this._detachOverlay(), this._options.onClose && this._options.onClose(this)), this._dc = !1;
+  close(t) {
+    this._dc || (this._prevColor != this.getHEX() && this._options.onChange && this._options.onChange(this), this._detachOverlay(t), this._options.onClose && this._options.onClose(this)), this._dc = !1;
   }
   getRGB() {
     return { ...this._color.toRGB(), a: this._color.a };
@@ -453,7 +453,7 @@ const h = class h {
   }
   setColor(t) {
     const { h: e, s: o, v: i, a: s } = u.parse(t);
-    this._color = new T(e, o, i, s), this._updateGUI(), this._options.onInput(this);
+    this._color = new R(e, o, i, s), this._updateGUI(), this._options.onInput(this);
   }
   _initDOM() {
     const t = c("div", ["yk-overlay-wrapper"]), e = c("div", ["yk-wrapper"]);
@@ -682,9 +682,9 @@ const h = class h {
     const { overlayWrapper: t } = this._dom, e = t.parentElement;
     document.body.appendChild(t), t.classList.remove("yk-overlay-wrapper--static"), this._updateTheme(this._options.theme), this._updateGUI(), this._updatePosition(), l(window, "resize", this._onResizeScrollWindowBind), l(window, "scroll", this._onResizeScrollWindowBind), l(document, "click", this._onClickCloseBind), l(document, "keyup", this._onKeyUpCloseBind), e != t.parentElement && this._options.onContainerChange && this._options.onContainerChange(this, e);
   }
-  _detachOverlay() {
-    var t;
-    this._dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open"), this._removeWindowEvents(), this._isOpen = !1, (t = this._dom.target) == null || t.focus();
+  _detachOverlay(t) {
+    var e;
+    this._dom.overlayWrapper.classList.remove("yk-overlay-wrapper--open"), this._removeWindowEvents(), this._isOpen = !1, (t == null ? void 0 : t.preventFocusTarget) != !0 && ((e = this._dom.target) == null || e.focus());
   }
   _onKeydownCursor(t) {
     if (["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"].includes(t.key)) {
@@ -1312,7 +1312,9 @@ const h = class h {
       this.close();
     else {
       if (!h._isTargetInViewport(o)) {
-        this.close();
+        this.close({
+          preventFocusTarget: !0
+        });
         return;
       }
       this._setPositionAxis(this._getPositionAxis());
@@ -1393,8 +1395,8 @@ const h = class h {
       f += i[v] + M[i[v]];
     let y = "", C = "";
     for (let v = 1; v < f.length; v += 2) {
-      const R = f[v];
-      R == "2" && (y = y + f[v - 1]), R == "1" && (C = C + f[v - 1]);
+      const T = f[v];
+      T == "2" && (y = y + f[v - 1]), T == "1" && (C = C + f[v - 1]);
     }
     y != "" ? y.includes(g) == !1 && (g = y[0]) : C != "" ? C.includes(g) == !1 && (g = C[0]) : g = "b";
     let b = 0, m = 0;
@@ -1449,8 +1451,8 @@ const h = class h {
   static _isTargetInViewport(t) {
     if (!t)
       return !1;
-    const e = t.getBoundingClientRect();
-    return e.top >= 0 && e.left >= 0 && e.bottom <= (window.innerHeight || document.documentElement.clientHeight) && e.right <= (window.innerWidth || document.documentElement.clientWidth);
+    const e = t.getBoundingClientRect(), o = window.innerHeight || document.documentElement.clientHeight, i = window.innerWidth || document.documentElement.clientWidth;
+    return e.bottom > 0 && e.top < o && e.right > 0 && e.left < i;
   }
   static _getPageHeight() {
     return Math.max(
