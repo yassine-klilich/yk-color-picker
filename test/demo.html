@@ -1,324 +1,1596 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Yassine KLILICH - YKColorPicker Demo</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>YKColorPicker Demo</title>
+        <meta name="description" content="Interactive playground for YKColorPicker, a keyboard-friendly color picker supporting RGB, HSV, HSL and HEX." />
+        <script>
+            // Apply the page theme before first paint to avoid a light flash
+            (function () {
+                let theme;
+                try {
+                    theme = localStorage.getItem("yk-demo-theme");
+                } catch {}
+                if (theme !== "light" && theme !== "dark") {
+                    theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+                }
+                document.documentElement.dataset.theme = theme;
+            })();
+        </script>
+        <style>
+            :root {
+                --bg: #f5f5f3;
+                --surface: #ffffff;
+                --surface-2: #f0f0ed;
+                --border: #e3e3df;
+                --border-strong: #cfcfca;
+                --text: #1b1b19;
+                --text-2: #5c5c57;
+                --text-3: #8a8a84;
+                --dot: #d6d6d1;
+                --danger: #c2410c;
+                --shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 4px 16px rgb(0 0 0 / 4%);
+                --shadow-raised: 0 1px 2px rgb(0 0 0 / 10%), 0 1px 1px rgb(0 0 0 / 4%);
+                --checker: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'%3E%3Cpath fill='%23fff' d='M0 0h2v2H0z'/%3E%3Cpath fill='%23d9d9d9' d='M0 0h1v1H0zM1 1h1v1H1z'/%3E%3C/svg%3E");
+                --picked: #ff0000;
+                --radius: 12px;
+                --radius-sm: 8px;
+                --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                --mono: ui-monospace, SFMono-Regular, "Cascadia Code", Menlo, Consolas, monospace;
+                color-scheme: light;
+            }
+            :root[data-theme="dark"] {
+                --bg: #111112;
+                --surface: #19191b;
+                --surface-2: #232326;
+                --border: #2b2b2f;
+                --border-strong: #3a3a3f;
+                --text: #ececea;
+                --text-2: #a3a39e;
+                --text-3: #74746f;
+                --dot: #2e2e33;
+                --danger: #fb923c;
+                --shadow: 0 1px 2px rgb(0 0 0 / 30%);
+                --shadow-raised: 0 1px 2px rgb(0 0 0 / 50%);
+                color-scheme: dark;
+            }
 
-    <style>
-      * {
-        box-sizing: border-box;
-      }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: var(--bg);
+                color: var(--text);
+                font-family: var(--font);
+                font-size: 14px;
+                line-height: 1.5;
+                -webkit-font-smoothing: antialiased;
+            }
+            a {
+                color: inherit;
+            }
+            button {
+                font: inherit;
+                color: inherit;
+            }
+            code,
+            kbd,
+            pre {
+                font-family: var(--mono);
+            }
+            :focus-visible {
+                outline: 2px solid var(--text);
+                outline-offset: 2px;
+            }
+            .sr-only {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                clip: rect(0 0 0 0);
+                white-space: nowrap;
+            }
 
-      body {
-        font-family: Arial, sans-serif;
-        color: #333;
-        margin: 0;
-      }
-      .color-picker-container {
-        display: flex;
-        flex-direction: column;
-        margin: 0 auto;
-      }
-      #color-display {
-        width: 100px;
-        height: 100px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        align-self: center;
-      }
-      .color-info {
-        margin-top: 10px;
-        font-size: 16px;
-      }
-      .btn {
-        background: #007bff;
-        color: #fff;
-        border: none;
-        padding: 10px 15px;
-        font-size: 14px;
-        border-radius: 3px;
-        cursor: pointer;
-        align-self: center;
-      }
-      .btn:hover {
-        background: #0056b3;
-      }
+            /* Header */
+            .site-header {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px 24px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+            }
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 650;
+                font-size: 16px;
+                text-decoration: none;
+            }
+            .brand-mark {
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: conic-gradient(red, #ff0, #0f0, #0ff, #00f, #f0f, red);
+                box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+            }
+            .badge {
+                font-family: var(--mono);
+                font-size: 11px;
+                font-weight: 500;
+                color: var(--text-2);
+                background: var(--surface-2);
+                border: 1px solid var(--border);
+                border-radius: 999px;
+                padding: 1px 8px;
+            }
+            .site-nav {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            .site-nav a {
+                display: inline-flex;
+                align-items: center;
+                height: 34px;
+                padding: 0 12px;
+                border-radius: var(--radius-sm);
+                color: var(--text-2);
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .site-nav a:hover,
+            .theme-toggle:hover {
+                color: var(--text);
+                background: var(--surface-2);
+            }
+            .theme-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 34px;
+                height: 34px;
+                padding: 0;
+                margin-left: 4px;
+                color: var(--text-2);
+                background: transparent;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+            }
+            .theme-toggle svg {
+                width: 17px;
+                height: 17px;
+            }
+            .theme-toggle .icon-sun,
+            :root[data-theme="dark"] .theme-toggle .icon-moon {
+                display: none;
+            }
+            :root[data-theme="dark"] .theme-toggle .icon-sun {
+                display: block;
+            }
+            .site-nav .icon-link {
+                padding: 0 8px;
+            }
 
-      .wrapper {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        height: 100vh;
-        height: 100dvh;
-      }
+            /* Intro */
+            .intro {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 24px 24px 32px;
+            }
+            .intro h1 {
+                margin: 0;
+                font-size: clamp(28px, 4vw, 40px);
+                line-height: 1.15;
+                letter-spacing: -0.02em;
+                font-weight: 700;
+                max-width: 22ch;
+                text-wrap: balance;
+            }
+            .intro p {
+                margin: 12px 0 20px;
+                color: var(--text-2);
+                font-size: 16px;
+                max-width: 56ch;
+            }
+            .install {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                max-width: 100%;
+                padding: 4px 4px 4px 14px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                box-shadow: var(--shadow);
+            }
+            .install code {
+                font-size: 13px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .install code::before {
+                content: "$ ";
+                color: var(--text-3);
+            }
 
-      .form-group {
-        border-right: 1px solid #ddd;
-        background: #f4f4f4;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        row-gap: 20px;
-        height: 100%;
-        overflow: auto;
-      }
+            /* Workspace grid */
+            .workspace {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 24px 48px;
+                display: grid;
+                gap: 16px;
+                grid-template-columns: minmax(0, 1fr) 340px;
+                grid-template-areas:
+                    "stage options"
+                    "values events"
+                    "code events";
+                align-items: start;
+            }
+            .area-stage {
+                grid-area: stage;
+                align-self: stretch;
+            }
+            .area-options {
+                grid-area: options;
+            }
+            .area-values {
+                grid-area: values;
+            }
+            .area-events {
+                grid-area: events;
+            }
+            .area-code {
+                grid-area: code;
+            }
 
-      .form-control {
-        display: flex;
-        flex-direction: column;
-        row-gap: 4px;
-      }
+            .card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                min-width: 0;
+            }
+            .card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 14px 16px;
+                border-bottom: 1px solid var(--border);
+            }
+            .card-title {
+                margin: 0;
+                font-size: 13px;
+                font-weight: 600;
+            }
+            .card-body {
+                padding: 16px;
+            }
 
-      input:is([type="radio"], [type="checkbox"]) {
-        width: 16px;
-        height: 16px;
-      }
+            /* Stage */
+            .stage {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                min-height: 420px;
+                overflow: hidden;
+                background-color: var(--surface);
+                background-image: radial-gradient(var(--dot) 1px, transparent 1.2px);
+                background-size: 18px 18px;
+                background-position: center;
+            }
+            .stage::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(closest-side, color-mix(in srgb, var(--picked) 22%, transparent), transparent);
+                background-size: 520px 360px;
+                background-repeat: no-repeat;
+                background-position: center;
+                pointer-events: none;
+                transition: background 0.2s;
+            }
+            .stage-label {
+                position: relative;
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 12px 14px;
+                font-size: 12px;
+                color: var(--text-3);
+            }
+            .stage-center {
+                position: relative;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
+                padding: 24px 16px 48px;
+            }
+            .trigger {
+                display: inline-flex;
+                align-items: center;
+                gap: 12px;
+                height: 52px;
+                padding: 0 18px 0 10px;
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: 999px;
+                box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.15s, box-shadow 0.15s;
+            }
+            .trigger:hover {
+                box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
+            }
+            .trigger:active {
+                transform: scale(0.98);
+            }
+            .trigger .trigger-hex {
+                font-family: var(--mono);
+                font-weight: 400;
+                font-size: 13px;
+                color: var(--text-2);
+            }
+            .target-row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+            }
+            .target-candidate {
+                transition: opacity 0.15s;
+            }
+            .target-candidate[inert] {
+                opacity: 0.35;
+            }
+            .swatch-target {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 52px;
+                height: 52px;
+                padding: 0;
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+                cursor: pointer;
+            }
+            .swatch-target .swatch {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+            }
+            .input-target {
+                width: 120px;
+                height: 52px;
+                padding: 0 12px;
+                font-family: var(--mono);
+                font-size: 13px;
+                text-align: center;
+                color: var(--text);
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+                cursor: pointer;
+                outline: none;
+            }
+            .input-target:focus-visible {
+                outline: 2px solid var(--text);
+                outline-offset: 2px;
+            }
+            .inline-host:empty {
+                display: none;
+            }
+            .method-bar {
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 12px 14px;
+                border-top: 1px solid var(--border);
+                background: color-mix(in srgb, var(--surface) 85%, transparent);
+            }
+            .method-bar-label {
+                margin-right: 4px;
+                font-size: 12px;
+                color: var(--text-3);
+            }
+            .method-bar .btn {
+                font-family: var(--mono);
+                background: var(--surface);
+            }
+            .swatch {
+                position: relative;
+                flex: none;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: var(--checker) 0 0 / 8px 8px;
+                overflow: hidden;
+            }
+            .swatch::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: inherit;
+                background: var(--picked);
+                box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+            }
+            .kbd-hints {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px 16px;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                font-size: 12px;
+                color: var(--text-3);
+            }
+            kbd {
+                display: inline-block;
+                min-width: 20px;
+                padding: 0 5px;
+                font-size: 11px;
+                line-height: 18px;
+                text-align: center;
+                color: var(--text-2);
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-bottom-width: 2px;
+                border-radius: 4px;
+            }
 
-      .info-icon {
-        cursor: help;
-      }
+            /* Form controls */
+            .options-form {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                padding: 16px;
+            }
+            .field {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                min-width: 0;
+            }
+            .field-label {
+                padding: 0;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-2);
+            }
+            .field-help {
+                margin: 0;
+                font-size: 12px;
+                color: var(--text-3);
+            }
+            .field-error {
+                display: none;
+                margin: 0;
+                font-size: 12px;
+                color: var(--danger);
+            }
+            .field.is-invalid .field-error {
+                display: block;
+            }
+            .field.is-invalid .field-help {
+                display: none;
+            }
+            .field.is-invalid .text-input {
+                border-color: var(--danger);
+            }
+            .field.is-disabled {
+                opacity: 0.45;
+            }
+            .input-wrap {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+            .input-wrap .swatch {
+                position: absolute;
+                left: 8px;
+                width: 20px;
+                height: 20px;
+                border-radius: 5px;
+                pointer-events: none;
+            }
+            .text-input {
+                width: 100%;
+                height: 36px;
+                padding: 0 10px;
+                font-family: var(--mono);
+                font-size: 13px;
+                color: var(--text);
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: var(--radius-sm);
+                outline: none;
+            }
+            .input-wrap .swatch + .text-input {
+                padding-left: 36px;
+            }
+            .text-input:focus {
+                border-color: var(--text);
+                box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 12%, transparent);
+            }
 
-      .flex {
-        display: flex;
-      }
-      .column-gap-6 {
-        column-gap: 6px;
-      }
-      .align-center {
-        align-items: center;
-      }
-      .line-height-0 {
-        line-height: 0;
-      }
+            .segmented {
+                display: grid;
+                grid-auto-columns: 1fr;
+                grid-auto-flow: column;
+                gap: 2px;
+                padding: 3px;
+                background: var(--surface-2);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+            }
+            .segmented label {
+                position: relative;
+            }
+            .segmented input {
+                position: absolute;
+                opacity: 0;
+                pointer-events: none;
+            }
+            .segmented span {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 28px;
+                padding: 0 6px;
+                border-radius: 7px;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text-2);
+                cursor: pointer;
+                user-select: none;
+                transition: background 0.12s, color 0.12s;
+            }
+            .segmented span:hover {
+                color: var(--text);
+            }
+            .segmented input:checked + span {
+                color: var(--text);
+                background: var(--surface);
+                box-shadow: var(--shadow-raised);
+            }
+            :root[data-theme="dark"] .segmented input:checked + span {
+                background: var(--border-strong);
+            }
+            .segmented input:focus-visible + span {
+                outline: 2px solid var(--text);
+                outline-offset: 1px;
+            }
 
-      input[type="text"],
-      select {
-        height: 22px;
-        padding: 0 4px;
-        line-height: 0;
-      }
+            .switch-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                cursor: pointer;
+            }
+            .switch-row + .switch-row {
+                margin-top: 4px;
+            }
+            .switch-row .switch-text {
+                font-size: 13px;
+            }
+            .switch-row .switch-text small {
+                display: block;
+                font-size: 12px;
+                color: var(--text-3);
+            }
+            .switch {
+                appearance: none;
+                position: relative;
+                flex: none;
+                width: 34px;
+                height: 20px;
+                margin: 0;
+                border-radius: 999px;
+                background: var(--border-strong);
+                cursor: pointer;
+                transition: background 0.15s;
+            }
+            .switch::after {
+                content: "";
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #fff;
+                box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+                transition: transform 0.15s;
+            }
+            .switch:checked {
+                background: var(--text);
+            }
+            .switch:checked::after {
+                transform: translateX(14px);
+            }
+            :root[data-theme="dark"] .switch:checked::after {
+                background: var(--bg);
+            }
 
-      select {
-        padding: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrapper">
-      <div class="form-group" id="optionsForm">
-        <h3 style="margin: 0">Options</h3>
+            /* Buttons */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                height: 30px;
+                padding: 0 10px;
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--text-2);
+                background: transparent;
+                border: 1px solid transparent;
+                border-radius: 7px;
+                cursor: pointer;
+                white-space: nowrap;
+            }
+            .btn:hover {
+                color: var(--text);
+                background: var(--surface-2);
+            }
+            .btn-outline {
+                border-color: var(--border-strong);
+            }
+            .icon-btn {
+                width: 30px;
+                padding: 0;
+            }
+            .icon-btn svg,
+            .btn svg {
+                width: 15px;
+                height: 15px;
+                flex: none;
+            }
+            .icon-btn .icon-check,
+            .btn .icon-check,
+            .is-copied .icon-copy {
+                display: none;
+            }
+            .is-copied .icon-check {
+                display: block;
+                color: #16a34a;
+            }
 
-        <!-- input for color option -->
-        <div class="form-control">
-          <label>Color</label>
-          <input id="colorInput" type="text" value="#ff0000" />
-        </div>
+            /* Values */
+            .values-body {
+                display: flex;
+                gap: 16px;
+                padding: 16px;
+                align-items: stretch;
+            }
+            .values-swatch {
+                flex: none;
+                width: 120px;
+                border-radius: 10px;
+                min-height: 120px;
+            }
+            .values-swatch::after {
+                box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+            }
+            .value-list {
+                flex: 1;
+                min-width: 0;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            .value-row {
+                display: grid;
+                grid-template-columns: 44px minmax(0, 1fr) auto;
+                align-items: center;
+                gap: 8px;
+                padding: 4px 4px 4px 10px;
+                border-radius: var(--radius-sm);
+            }
+            .value-row.is-active {
+                background: var(--surface-2);
+            }
+            .value-row dt,
+            .value-format {
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                color: var(--text-3);
+            }
+            .value-row.is-active .value-format {
+                color: var(--text);
+            }
+            .value-text {
+                font-family: var(--mono);
+                font-size: 13px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
 
-        <div class="form-control">
-          <label>Position</label>
-          <select id="position">
-            <option value="t">Top</option>
-            <option selected value="b">Bottom</option>
-            <option value="l">Left</option>
-            <option value="r">Right</option>
-          </select>
-        </div>
+            /* Events */
+            .event-chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 16px 16px 12px;
+            }
+            .chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                height: 26px;
+                padding: 0 4px 0 10px;
+                font-family: var(--mono);
+                font-size: 11.5px;
+                color: var(--text-3);
+                background: var(--surface-2);
+                border: 1px solid var(--border);
+                border-radius: 999px;
+                transition: color 0.3s, border-color 0.3s;
+            }
+            .chip-count {
+                min-width: 18px;
+                padding: 0 5px;
+                font-size: 10.5px;
+                line-height: 18px;
+                text-align: center;
+                border-radius: 999px;
+                background: var(--surface);
+            }
+            .chip.has-fired {
+                color: var(--text);
+            }
+            .chip.is-flashing {
+                border-color: var(--text);
+                transition: none;
+            }
+            .event-log {
+                margin: 0;
+                padding: 4px 8px 8px;
+                list-style: none;
+                border-top: 1px solid var(--border);
+                max-height: 280px;
+                overflow-y: auto;
+            }
+            .event-log li {
+                display: grid;
+                grid-template-columns: auto minmax(0, 1fr) auto;
+                gap: 10px;
+                align-items: baseline;
+                padding: 6px 8px;
+                border-radius: 6px;
+                font-size: 12px;
+            }
+            .event-log li:first-child {
+                background: var(--surface-2);
+            }
+            .event-log .log-time {
+                font-family: var(--mono);
+                font-size: 11px;
+                color: var(--text-3);
+            }
+            .event-log .log-name {
+                font-family: var(--mono);
+                font-weight: 600;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .event-log .log-name small {
+                font-weight: 400;
+                color: var(--text-3);
+            }
+            .event-log .log-detail {
+                font-family: var(--mono);
+                font-size: 11px;
+                color: var(--text-2);
+            }
+            .event-log li.is-call .log-name {
+                font-weight: 500;
+                color: var(--text-2);
+            }
+            .event-log li.is-call .log-name::before {
+                content: "→ ";
+                color: var(--text-3);
+            }
+            .event-log .log-empty {
+                display: block;
+                padding: 16px 8px;
+                color: var(--text-3);
+                text-align: center;
+                background: none;
+            }
 
-        <div class="form-control">
-          <label>Position fallback</label>
-          <div class="flex align-center column-gap-6">
-            <input
-              id="position-fallback"
-              value="btrl"
-              type="text"
-              style="flex-grow: 1"
-            />
-            <i
-              class="info-icon line-height-0"
-              title="Position Fallback must contain only the characters 'b' (bottom), 't' (top), 'l' (left), and 'r' (right) without any repetition. Examples of a valid value: 'btrl', 'lr', or just one character for example 'b' to force at one position"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                color="#000000"
-                fill="none"
-              >
-                <path
-                  d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <path
-                  d="M12.2422 17V12C12.2422 11.5286 12.2422 11.2929 12.0957 11.1464C11.9493 11 11.7136 11 11.2422 11"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M11.992 8H12.001"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </i>
-          </div>
-        </div>
+            /* Code */
+            .code-block {
+                margin: 0;
+                padding: 16px;
+                overflow-x: auto;
+                font-size: 12.5px;
+                line-height: 1.65;
+                tab-size: 2;
+            }
+            .tok-key {
+                color: var(--text);
+            }
+            .tok-str {
+                color: #0f7b4a;
+            }
+            .tok-lit {
+                color: #9a3db8;
+            }
+            .tok-dim {
+                color: var(--text-3);
+            }
+            :root[data-theme="dark"] .tok-str {
+                color: #6ee7a8;
+            }
+            :root[data-theme="dark"] .tok-lit {
+                color: #d8a4f0;
+            }
 
-        <div class="form-control">
-          <label>Color Format</label>
-          <select id="color-format">
-            <option selected value="rgb">RGB</option>
-            <option value="hex">HEX</option>
-            <option value="hsv">HSV</option>
-            <option value="hsl">HSL</option>
-          </select>
-        </div>
+            .site-footer {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 24px 32px;
+                font-size: 12px;
+                color: var(--text-3);
+            }
 
-        <!-- add theme radio button -->
-        <div class="form-control">
-          <label>Theme</label>
-          <div class="form-input-wrapper">
-            <label>
-              <input type="radio" name="theme" value="light" checked />
-              Light
-            </label>
-            <br />
-            <label>
-              <input type="radio" name="theme" value="dark" />
-              Dark
-            </label>
-          </div>
-        </div>
+            @media (max-width: 960px) {
+                .workspace {
+                    grid-template-columns: minmax(0, 1fr);
+                    grid-template-areas:
+                        "stage"
+                        "options"
+                        "values"
+                        "events"
+                        "code";
+                }
+                .stage {
+                    min-height: 360px;
+                }
+            }
+            @media (max-width: 560px) {
+                .site-header,
+                .intro,
+                .workspace,
+                .site-footer {
+                    padding-left: 16px;
+                    padding-right: 16px;
+                }
+                .site-nav .text-link {
+                    display: none;
+                }
+                .values-body {
+                    flex-direction: column;
+                }
+                .values-swatch {
+                    width: 100%;
+                    min-height: 72px;
+                }
+                .kbd-hints {
+                    display: none;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    transition: none !important;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header class="site-header">
+            <a class="brand" href="https://github.com/yassine-klilich/yk-color-picker" target="_blank" rel="noopener">
+                <span class="brand-mark" aria-hidden="true"></span>
+                YKColorPicker
+                <span class="badge">v2.0.1</span>
+            </a>
+            <nav class="site-nav" aria-label="Project links">
+                <a class="text-link" href="https://github.com/yassine-klilich/yk-color-picker#readme" target="_blank" rel="noopener">Docs</a>
+                <a class="text-link" href="https://www.npmjs.com/package/yk-color-picker" target="_blank" rel="noopener">npm</a>
+                <a class="icon-link" href="https://github.com/yassine-klilich/yk-color-picker" target="_blank" rel="noopener" title="GitHub repository" aria-label="GitHub repository">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                        <path
+                            fill-rule="evenodd"
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                        />
+                    </svg>
+                </a>
+                <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to dark theme" title="Switch to dark theme">
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>
+                </button>
+            </nav>
+        </header>
 
-        <!-- 2 Checkboxes whether to close on scroll and close on resize -->
-        <div class="form-control">
-          <h4 style="margin: 0; font-weight: 400">Close on</h4>
-          <label class="flex align-center column-gap-6">
-            <input type="checkbox" id="closeOnScroll" checked />
-            Scroll
-          </label>
-          <label class="flex align-center column-gap-6">
-            <input type="checkbox" id="closeOnResize" />
-            Resize
-          </label>
-        </div>
+        <section class="intro">
+            <h1>A color picker you can drive with the keyboard.</h1>
+            <p>RGB, HSV, HSL and HEX, alpha, light and dark themes, and smart positioning around its target. Change the options and watch the events fire.</p>
+            <div class="install">
+                <code id="install-cmd">npm install yk-color-picker</code>
+                <button class="btn icon-btn" type="button" data-copy-from="install-cmd" aria-label="Copy install command">
+                    <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                    <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                </button>
+            </div>
+        </section>
 
-        <div class="form-control">
-          <h4 style="margin: 0">Events</h4>
-          <ul style="margin: 0">
-            <li>onInit</li>
-            <li>onOpen</li>
-            <li>onClose</li>
-            <li>onInput</li>
-            <li>onChange</li>
-            <li>onCopy</li>
-            <li>onRepresentationChange</li>
-            <li>onTargetChange</li>
-            <li>onContainerChange</li>
-          </ul>
-        </div>
-      </div>
+        <main class="workspace">
+            <!-- Stage -->
+            <section class="card stage area-stage" aria-label="Playground">
+                <div class="stage-label">
+                    <span>Playground</span>
+                    <span id="stage-status">Closed</span>
+                </div>
+                <div class="stage-center">
+                    <div class="target-row">
+                        <button id="color-picker-trigger" class="trigger target-candidate" data-target-key="button" type="button">
+                            <span class="swatch" aria-hidden="true"></span>
+                            <span>Pick a color</span>
+                            <span class="trigger-hex" id="trigger-hex"></span>
+                        </button>
+                        <button id="target-swatch" class="swatch-target target-candidate" data-target-key="swatch" type="button" aria-label="Pick a color">
+                            <span class="swatch" aria-hidden="true"></span>
+                        </button>
+                        <input id="target-input" class="input-target target-candidate" data-target-key="input" type="text" readonly aria-label="Picked color" />
+                    </div>
+                    <div class="inline-host" id="inline-host"></div>
+                    <ul class="kbd-hints" aria-label="Keyboard shortcuts">
+                        <li><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> move cursor</li>
+                        <li><kbd>Enter</kbd> confirm</li>
+                        <li><kbd>Esc</kbd> revert &amp; close</li>
+                    </ul>
+                </div>
+                <div class="method-bar" id="method-bar" role="group" aria-label="Methods">
+                    <span class="method-bar-label">Methods</span>
+                    <button class="btn btn-outline" type="button" data-method="open">open()</button>
+                    <button class="btn btn-outline" type="button" data-method="close">close()</button>
+                    <button class="btn btn-outline" type="button" data-method="setColor" title="Sets a random color">setColor()</button>
+                    <button class="btn btn-outline" type="button" data-method="getColor">getColor()</button>
+                    <button class="btn btn-outline" type="button" data-method="isOpen">isOpen()</button>
+                </div>
+            </section>
 
-      <div class="color-picker-container">
-        <h1>YKColorPicker Demo</h1>
+            <!-- Options -->
+            <aside class="card area-options" id="options-panel" aria-labelledby="options-title">
+                <div class="card-header">
+                    <h2 class="card-title" id="options-title">Options</h2>
+                    <button class="btn btn-outline" type="button" id="reset-options">Reset</button>
+                </div>
+                <form class="options-form" id="options-form" autocomplete="off" onsubmit="return false">
+                    <div class="field" id="color-field">
+                        <label class="field-label" for="opt-color">color</label>
+                        <div class="input-wrap">
+                            <span class="swatch" aria-hidden="true"></span>
+                            <input class="text-input" id="opt-color" type="text" spellcheck="false" aria-describedby="color-error" />
+                        </div>
+                        <p class="field-error" id="color-error">Not a valid color. Try a HEX, rgb() or named color.</p>
+                    </div>
 
-        <div id="color-display"></div>
-        <div class="color-info">
-          <p><strong>HEX:</strong> <span id="hex-value"></span></p>
-          <p><strong>RGB:</strong> <span id="rgb-value"></span></p>
-          <p><strong>HSV:</strong> <span id="hsv-value"></span></p>
-          <p><strong>HSL:</strong> <span id="hsl-value"></span></p>
-        </div>
-        <button id="color-picker-trigger" class="btn">Pick a Color</button>
-      </div>
-    </div>
+                    <fieldset class="field">
+                        <legend class="field-label">target</legend>
+                        <div class="segmented">
+                            <label><input type="radio" name="target" value="button" /><span>Button</span></label>
+                            <label><input type="radio" name="target" value="swatch" /><span>Swatch</span></label>
+                            <label><input type="radio" name="target" value="input" /><span>Input</span></label>
+                        </div>
+                    </fieldset>
 
-    <script type="module">
-      import { YKColorPicker, YKColorPickerPosition } from "yk-color-picker";
+                    <fieldset class="field">
+                        <legend class="field-label">container</legend>
+                        <div class="segmented">
+                            <label><input type="radio" name="container" value="popup" /><span>Popup</span></label>
+                            <label><input type="radio" name="container" value="inline" /><span>Inline</span></label>
+                        </div>
+                        <p class="field-help">Popup floats next to the target. Inline renders the picker inside the playground.</p>
+                    </fieldset>
 
-      optionsForm.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
+                    <fieldset class="field" data-popup-only>
+                        <legend class="field-label">position</legend>
+                        <div class="segmented">
+                            <label><input type="radio" name="position" value="t" /><span>Top</span></label>
+                            <label><input type="radio" name="position" value="b" /><span>Bottom</span></label>
+                            <label><input type="radio" name="position" value="l" /><span>Left</span></label>
+                            <label><input type="radio" name="position" value="r" /><span>Right</span></label>
+                        </div>
+                    </fieldset>
 
-      const colorDisplay = document.getElementById("color-display");
-      const hexValue = document.getElementById("hex-value");
-      const rgbValue = document.getElementById("rgb-value");
-      const hsvValue = document.getElementById("hsv-value");
-      const hslValue = document.getElementById("hsl-value");
+                    <div class="field" id="fallback-field" data-popup-only>
+                        <label class="field-label" for="opt-fallback">positionFallback</label>
+                        <input class="text-input" id="opt-fallback" type="text" maxlength="4" spellcheck="false" aria-describedby="fallback-help fallback-error" />
+                        <p class="field-help" id="fallback-help">Order to try when there's no room. Any of <code>b t l r</code>, no repeats.</p>
+                        <p class="field-error" id="fallback-error">Use only b, t, l and r, each at most once (e.g. <code>btrl</code>, <code>lr</code>, <code>b</code>).</p>
+                    </div>
 
-      window.colorPicker = new YKColorPicker({
-        target: document.getElementById("color-picker-trigger"),
-        color: "#ff0000",
-        onInput: (instance) => {
-          const hex = instance.getHEX();
-          const rgb = instance.getRGB();
-          const hsl = instance.getHSL();
-          const hsv = instance.getHSV();
+                    <fieldset class="field">
+                        <legend class="field-label">representation</legend>
+                        <div class="segmented">
+                            <label><input type="radio" name="representation" value="rgb" /><span>RGB</span></label>
+                            <label><input type="radio" name="representation" value="hex" /><span>HEX</span></label>
+                            <label><input type="radio" name="representation" value="hsv" /><span>HSV</span></label>
+                            <label><input type="radio" name="representation" value="hsl" /><span>HSL</span></label>
+                        </div>
+                    </fieldset>
 
-          colorDisplay.style.backgroundColor = hex;
-          hexValue.textContent = hex;
-          rgbValue.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-          hslValue.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
-          hsvValue.textContent = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
-        },
-      });
+                    <fieldset class="field">
+                        <legend class="field-label">theme</legend>
+                        <div class="segmented">
+                            <label><input type="radio" name="theme" value="light" /><span>Light</span></label>
+                            <label><input type="radio" name="theme" value="dark" /><span>Dark</span></label>
+                        </div>
+                    </fieldset>
 
-      document.getElementById("position").addEventListener("change", (e) => {
-        colorPicker.updateOptions({
-          position: e.target.value,
-        });
-      });
+                    <fieldset class="field" data-popup-only>
+                        <legend class="field-label">Close behavior</legend>
+                        <label class="switch-row">
+                            <span class="switch-text">closeOnScroll<small>Close when the page scrolls</small></span>
+                            <input class="switch" type="checkbox" role="switch" id="opt-close-scroll" />
+                        </label>
+                        <label class="switch-row">
+                            <span class="switch-text">closeOnResize<small>Close when the window resizes</small></span>
+                            <input class="switch" type="checkbox" role="switch" id="opt-close-resize" />
+                        </label>
+                    </fieldset>
+                </form>
+            </aside>
 
-      document
-        .getElementById("color-format")
-        .addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            representation: e.target.value,
-          });
-        });
+            <!-- Values -->
+            <section class="card area-values" aria-labelledby="values-title">
+                <div class="card-header">
+                    <h2 class="card-title" id="values-title">Current color</h2>
+                </div>
+                <div class="values-body">
+                    <div class="swatch values-swatch" aria-hidden="true"></div>
+                    <ul class="value-list">
+                        <li class="value-row" data-format="hex">
+                            <span class="value-format">HEX</span>
+                            <span class="value-text" id="value-hex"></span>
+                            <button class="btn icon-btn" type="button" data-copy-from="value-hex" aria-label="Copy HEX value">
+                                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                            </button>
+                        </li>
+                        <li class="value-row" data-format="rgb">
+                            <span class="value-format">RGB</span>
+                            <span class="value-text" id="value-rgb"></span>
+                            <button class="btn icon-btn" type="button" data-copy-from="value-rgb" aria-label="Copy RGB value">
+                                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                            </button>
+                        </li>
+                        <li class="value-row" data-format="hsv">
+                            <span class="value-format">HSV</span>
+                            <span class="value-text" id="value-hsv"></span>
+                            <button class="btn icon-btn" type="button" data-copy-from="value-hsv" aria-label="Copy HSV value">
+                                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                            </button>
+                        </li>
+                        <li class="value-row" data-format="hsl">
+                            <span class="value-format">HSL</span>
+                            <span class="value-text" id="value-hsl"></span>
+                            <button class="btn icon-btn" type="button" data-copy-from="value-hsl" aria-label="Copy HSL value">
+                                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </section>
 
-      document
-        .getElementById("position-fallback")
-        .addEventListener("input", (e) => {
-          colorPicker.updateOptions({
-            positionFallback: e.target.value,
-          });
-        });
+            <!-- Events -->
+            <section class="card area-events" aria-labelledby="events-title">
+                <div class="card-header">
+                    <h2 class="card-title" id="events-title">Events</h2>
+                    <button class="btn btn-outline" type="button" id="clear-log">Clear</button>
+                </div>
+                <div class="event-chips" id="event-chips"></div>
+                <ul class="event-log" id="event-log"></ul>
+            </section>
 
-      document.getElementById("colorInput").addEventListener("input", (e) => {
-        colorPicker.updateOptions({
-          color: e.target.value,
-        });
-      });
+            <!-- Code -->
+            <section class="card area-code" aria-labelledby="code-title">
+                <div class="card-header">
+                    <h2 class="card-title" id="code-title">Configuration</h2>
+                    <button class="btn btn-outline" type="button" data-copy-from="code-output">
+                        <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                        <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre class="code-block"><code id="code-output"></code></pre>
+            </section>
+        </main>
 
-      document.querySelectorAll('input[name="theme"]').forEach((input) => {
-        input.addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            theme: e.target.value,
-          });
-        });
-      });
+        <footer class="site-footer">MIT licensed · Built by Yassine Klilich</footer>
 
-      document
-        .getElementById("closeOnScroll")
-        .addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            closeOnScroll: e.target.checked,
-          });
-        });
+        <p class="sr-only" id="copy-status" aria-live="polite"></p>
 
-      document
-        .getElementById("closeOnResize")
-        .addEventListener("change", (e) => {
-          colorPicker.updateOptions({
-            closeOnResize: e.target.checked,
-          });
-        });
-    </script>
-  </body>
+        <script type="module">
+            import { YKColorPicker } from "yk-color-picker";
+
+            const DEFAULTS = {
+                color: "#ff0000",
+                position: "b",
+                positionFallback: "btrl",
+                representation: "rgb",
+                theme: document.documentElement.dataset.theme,
+                closeOnScroll: true,
+                closeOnResize: false,
+                target: "button",
+                container: "popup",
+            };
+            const EVENTS = ["onInit", "onOpen", "onClose", "onInput", "onChange", "onCopy", "onRepresentationChange", "onTargetChange", "onContainerChange"];
+            const TARGETS = { button: "#color-picker-trigger", swatch: "#target-swatch", input: "#target-input" };
+            const INLINE_CONTAINER = "#inline-host";
+            // Options passed straight to the picker; target and container are mapped separately
+            const PICKER_KEYS = ["position", "positionFallback", "representation", "theme", "closeOnScroll", "closeOnResize"];
+
+            const state = { ...DEFAULTS };
+
+            function pickerOptions() {
+                return Object.fromEntries(PICKER_KEYS.map((key) => [key, state[key]]));
+            }
+
+            const root = document.documentElement;
+            const optionsPanel = document.getElementById("options-panel");
+            const colorField = document.getElementById("color-field");
+            const colorInput = document.getElementById("opt-color");
+            const fallbackField = document.getElementById("fallback-field");
+            const fallbackInput = document.getElementById("opt-fallback");
+            const closeScrollInput = document.getElementById("opt-close-scroll");
+            const closeResizeInput = document.getElementById("opt-close-resize");
+            const triggerHex = document.getElementById("trigger-hex");
+            const targetInput = document.getElementById("target-input");
+            const stageStatus = document.getElementById("stage-status");
+            const eventChips = document.getElementById("event-chips");
+            const eventLog = document.getElementById("event-log");
+            const codeOutput = document.getElementById("code-output");
+            const copyStatus = document.getElementById("copy-status");
+
+            // ---------- Color formatting ----------
+
+            function formatColor(instance) {
+                const rgb = instance.getRGB();
+                const hsv = instance.getHSV();
+                const hsl = instance.getHSL();
+                const a = Number(rgb.a.toFixed(2));
+                const r = Math.round;
+                if (a < 1) {
+                    return {
+                        hex: instance.getHEX(),
+                        rgb: `rgba(${r(rgb.r)}, ${r(rgb.g)}, ${r(rgb.b)}, ${a})`,
+                        hsv: `hsva(${r(hsv.h)}, ${r(hsv.s)}%, ${r(hsv.v)}%, ${a})`,
+                        hsl: `hsla(${r(hsl.h)}, ${r(hsl.s)}%, ${r(hsl.l)}%, ${a})`,
+                    };
+                }
+                return {
+                    hex: instance.getHEX(),
+                    rgb: `rgb(${r(rgb.r)}, ${r(rgb.g)}, ${r(rgb.b)})`,
+                    hsv: `hsv(${r(hsv.h)}, ${r(hsv.s)}%, ${r(hsv.v)}%)`,
+                    hsl: `hsl(${r(hsl.h)}, ${r(hsl.s)}%, ${r(hsl.l)}%)`,
+                };
+            }
+
+            // getColor() returns a string for HEX, otherwise an object whose keys reveal the model
+            function getRepresentation(instance) {
+                const color = instance.getColor();
+                if (typeof color === "string") return "hex";
+                if ("r" in color) return "rgb";
+                if ("v" in color) return "hsv";
+                return "hsl";
+            }
+
+            function renderColor(instance) {
+                const values = formatColor(instance);
+                root.style.setProperty("--picked", values.hex);
+                triggerHex.textContent = values.hex;
+                targetInput.value = values.hex;
+                for (const format of ["hex", "rgb", "hsv", "hsl"]) {
+                    document.getElementById(`value-${format}`).textContent = values[format];
+                }
+                state.color = values.hex;
+                if (document.activeElement !== colorInput) {
+                    colorInput.value = values.hex;
+                    colorField.classList.remove("is-invalid");
+                }
+                renderCode();
+            }
+
+            function renderActiveFormat() {
+                document.querySelectorAll(".value-row").forEach((row) => {
+                    row.classList.toggle("is-active", row.dataset.format === state.representation);
+                });
+            }
+
+            // ---------- Event log ----------
+
+            const eventCounts = {};
+            const logEntries = [];
+            const MAX_LOG = 40;
+
+            EVENTS.forEach((name) => {
+                eventCounts[name] = 0;
+                const chip = document.createElement("span");
+                chip.className = "chip";
+                chip.id = `chip-${name}`;
+                chip.innerHTML = `${name}<span class="chip-count">0</span>`;
+                eventChips.appendChild(chip);
+            });
+
+            function logEvent(name, detail) {
+                eventCounts[name]++;
+                const chip = document.getElementById(`chip-${name}`);
+                chip.classList.add("has-fired");
+                chip.querySelector(".chip-count").textContent = eventCounts[name];
+                chip.classList.remove("is-flashing");
+                void chip.offsetWidth;
+                chip.classList.add("is-flashing");
+                clearTimeout(chip._flashTimer);
+                chip._flashTimer = setTimeout(() => chip.classList.remove("is-flashing"), 250);
+
+                pushLog(name, detail, "event");
+            }
+
+            function logCall(name, detail) {
+                pushLog(name, detail, "call");
+            }
+
+            function pushLog(name, detail, kind) {
+                // Collapse bursts (e.g. dragging fires onInput continuously) into one row
+                const last = logEntries[0];
+                const time = new Date().toLocaleTimeString([], { hour12: false });
+                if (last && last.name === name && last.kind === kind) {
+                    last.repeat++;
+                    last.detail = detail;
+                    last.time = time;
+                } else {
+                    logEntries.unshift({ name, detail, time, kind, repeat: 1 });
+                    logEntries.length = Math.min(logEntries.length, MAX_LOG);
+                }
+                renderLog();
+            }
+
+            function renderLog() {
+                eventLog.replaceChildren();
+                if (logEntries.length === 0) {
+                    const empty = document.createElement("li");
+                    empty.className = "log-empty";
+                    empty.textContent = "Interact with the picker to see events.";
+                    eventLog.appendChild(empty);
+                    return;
+                }
+                for (const entry of logEntries) {
+                    const li = document.createElement("li");
+                    li.classList.toggle("is-call", entry.kind === "call");
+                    const time = document.createElement("span");
+                    time.className = "log-time";
+                    time.textContent = entry.time;
+                    const name = document.createElement("span");
+                    name.className = "log-name";
+                    name.textContent = entry.name;
+                    if (entry.repeat > 1) {
+                        const repeat = document.createElement("small");
+                        repeat.textContent = ` ×${entry.repeat}`;
+                        name.appendChild(repeat);
+                    }
+                    const detail = document.createElement("span");
+                    detail.className = "log-detail";
+                    detail.textContent = entry.detail || "";
+                    li.append(time, name, detail);
+                    eventLog.appendChild(li);
+                }
+            }
+
+            document.getElementById("clear-log").addEventListener("click", () => {
+                logEntries.length = 0;
+                EVENTS.forEach((name) => {
+                    eventCounts[name] = 0;
+                    const chip = document.getElementById(`chip-${name}`);
+                    chip.classList.remove("has-fired");
+                    chip.querySelector(".chip-count").textContent = "0";
+                });
+                renderLog();
+            });
+
+            const handlers = {
+                onInit: () => logEvent("onInit"),
+                onOpen: () => {
+                    stageStatus.textContent = "Open";
+                    logEvent("onOpen");
+                },
+                onClose: () => {
+                    stageStatus.textContent = "Closed";
+                    logEvent("onClose");
+                },
+                onInput: (instance) => {
+                    renderColor(instance);
+                    logEvent("onInput", instance.getHEX());
+                },
+                onChange: (instance) => logEvent("onChange", instance.getHEX()),
+                onCopy: (instance) => logEvent("onCopy", instance.getHEX()),
+                onRepresentationChange: (instance) => {
+                    state.representation = getRepresentation(instance);
+                    syncRadios("representation", state.representation);
+                    renderActiveFormat();
+                    renderCode();
+                    logEvent("onRepresentationChange", state.representation);
+                },
+                onTargetChange: (instance) => logEvent("onTargetChange", instance.target ? `#${instance.target.id}` : "null"),
+                onContainerChange: () => logEvent("onContainerChange", state.container === "inline" ? INLINE_CONTAINER : "body"),
+            };
+
+            // ---------- Generated code ----------
+
+            function escapeHTML(value) {
+                return String(value).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+            }
+
+            function renderCode() {
+                const lines = [
+                    ["target", `"${TARGETS[state.target]}"`, "str"],
+                    ...(state.container === "inline" ? [["container", `"${INLINE_CONTAINER}"`, "str"]] : []),
+                    ["color", `"${state.color}"`, "str"],
+                    ["position", `"${state.position}"`, "str"],
+                    ["positionFallback", `"${state.positionFallback}"`, "str"],
+                    ["representation", `"${state.representation}"`, "str"],
+                    ["theme", `"${state.theme}"`, "str"],
+                    ["closeOnScroll", state.closeOnScroll, "lit"],
+                    ["closeOnResize", state.closeOnResize, "lit"],
+                ];
+                const body = lines.map(([key, value, kind]) => `  <span class="tok-key">${key}</span>: <span class="tok-${kind}">${escapeHTML(value)}</span>,`).join("\n");
+                codeOutput.innerHTML =
+                    `<span class="tok-lit">import</span> { YKColorPicker } <span class="tok-lit">from</span> <span class="tok-str">"yk-color-picker"</span>;\n\n` +
+                    `<span class="tok-lit">const</span> picker = <span class="tok-lit">new</span> YKColorPicker({\n${body}\n});`;
+            }
+
+            // ---------- Options UI ----------
+
+            function syncRadios(name, value) {
+                const input = document.querySelector(`input[name="${name}"][value="${value}"]`);
+                if (input) input.checked = true;
+            }
+
+            function isValidFallback(value) {
+                return /^[btlr]{1,4}$/.test(value) && !/(.).*\1/.test(value);
+            }
+
+            const themeToggle = document.getElementById("theme-toggle");
+
+            function applyPageTheme(theme) {
+                root.dataset.theme = theme;
+                const label = `Switch to ${theme === "dark" ? "light" : "dark"} theme`;
+                themeToggle.setAttribute("aria-label", label);
+                themeToggle.title = label;
+                try {
+                    localStorage.setItem("yk-demo-theme", theme);
+                } catch {}
+            }
+
+            // The page toggle also flips the picker; the picker's own theme option can still diverge from the page
+            themeToggle.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const theme = root.dataset.theme === "dark" ? "light" : "dark";
+                applyPageTheme(theme);
+                syncRadios("theme", theme);
+                setOption("theme", theme);
+            });
+
+            function syncForm() {
+                colorInput.value = state.color;
+                fallbackInput.value = state.positionFallback;
+                closeScrollInput.checked = state.closeOnScroll;
+                closeResizeInput.checked = state.closeOnResize;
+                syncRadios("position", state.position);
+                syncRadios("representation", state.representation);
+                syncRadios("theme", state.theme);
+                syncRadios("target", state.target);
+                syncRadios("container", state.container);
+                colorField.classList.remove("is-invalid");
+                fallbackField.classList.remove("is-invalid");
+                renderActiveFormat();
+                renderTargets();
+                renderContainerFields();
+            }
+
+            // Only the active target is interactive; the others are shown dimmed
+            function renderTargets() {
+                document.querySelectorAll(".target-candidate").forEach((element) => {
+                    element.inert = element.dataset.targetKey !== state.target;
+                });
+            }
+
+            // Position and close options only affect the popup
+            function renderContainerFields() {
+                const inline = state.container === "inline";
+                document.querySelectorAll("[data-popup-only]").forEach((field) => {
+                    field.classList.toggle("is-disabled", inline);
+                    field.querySelectorAll("input").forEach((input) => (input.disabled = inline));
+                });
+            }
+
+            function setTarget(key) {
+                state.target = key;
+                renderTargets();
+                colorPicker.updateOptions({ target: TARGETS[key] });
+                renderCode();
+            }
+
+            function setContainer(mode) {
+                state.container = mode;
+                renderContainerFields();
+                if (mode === "inline") {
+                    colorPicker.updateOptions({ container: INLINE_CONTAINER });
+                    // The inline picker is only visible while open
+                    if (!colorPicker.isOpen()) colorPicker.open();
+                } else {
+                    // An open inline picker stays open and becomes a popup next to its target
+                    colorPicker.updateOptions({ container: null });
+                }
+                renderCode();
+            }
+
+            function setOption(key, value) {
+                state[key] = value;
+                colorPicker.updateOptions({ [key]: value });
+                renderCode();
+            }
+
+            // Keep the picker open while options are being changed
+            optionsPanel.addEventListener("click", (e) => e.stopPropagation());
+
+            colorInput.addEventListener("input", () => {
+                const value = colorInput.value.trim();
+                if (!value) return;
+                try {
+                    colorPicker.updateOptions({ color: value });
+                    colorField.classList.remove("is-invalid");
+                } catch {
+                    colorField.classList.add("is-invalid");
+                }
+            });
+            colorInput.addEventListener("blur", () => {
+                colorInput.value = state.color;
+                colorField.classList.remove("is-invalid");
+            });
+
+            fallbackInput.addEventListener("input", () => {
+                const value = fallbackInput.value.trim().toLowerCase();
+                const valid = isValidFallback(value);
+                fallbackField.classList.toggle("is-invalid", !valid);
+                if (valid) setOption("positionFallback", value);
+            });
+
+            document.querySelectorAll('input[name="position"]').forEach((input) => {
+                input.addEventListener("change", () => setOption("position", input.value));
+            });
+            document.querySelectorAll('input[name="representation"]').forEach((input) => {
+                input.addEventListener("change", () => setOption("representation", input.value));
+            });
+            document.querySelectorAll('input[name="theme"]').forEach((input) => {
+                input.addEventListener("change", () => setOption("theme", input.value));
+            });
+            document.querySelectorAll('input[name="target"]').forEach((input) => {
+                input.addEventListener("change", () => setTarget(input.value));
+            });
+            document.querySelectorAll('input[name="container"]').forEach((input) => {
+                input.addEventListener("change", () => setContainer(input.value));
+            });
+            closeScrollInput.addEventListener("change", () => setOption("closeOnScroll", closeScrollInput.checked));
+            closeResizeInput.addEventListener("change", () => setOption("closeOnResize", closeResizeInput.checked));
+
+            document.getElementById("reset-options").addEventListener("click", () => {
+                const previous = { target: state.target, container: state.container };
+                // Reset the picker theme to match the page rather than the theme at load time
+                Object.assign(state, DEFAULTS, { theme: root.dataset.theme });
+                if (previous.container !== state.container) setContainer(state.container);
+                if (previous.target !== state.target) setTarget(state.target);
+                colorPicker.updateOptions(pickerOptions());
+                colorPicker.setColor(state.color);
+                syncForm();
+                renderCode();
+            });
+
+            // ---------- Methods ----------
+
+            function randomHex() {
+                return `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, "0")}`;
+            }
+
+            function formatResult(value) {
+                return typeof value === "string" ? value : JSON.stringify(value).replace(/"/g, "").replace(/,/g, ", ");
+            }
+
+            document.getElementById("method-bar").addEventListener("click", (e) => {
+                // Clicks here must not reach the document, which closes an open popup
+                e.stopPropagation();
+                const button = e.target.closest("[data-method]");
+                if (!button) return;
+                const method = button.dataset.method;
+                // Log calls first so the events they trigger appear above them
+                if (method === "setColor") {
+                    const hex = randomHex();
+                    logCall(`setColor("${hex}")`);
+                    colorPicker.setColor(hex);
+                } else if (method === "open" || method === "close") {
+                    logCall(`${method}()`);
+                    colorPicker[method]();
+                } else {
+                    logCall(`${method}()`, formatResult(colorPicker[method]()));
+                }
+            });
+
+            // ---------- Copy buttons ----------
+
+            async function copyText(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                } catch {
+                    const textarea = document.createElement("textarea");
+                    textarea.value = text;
+                    textarea.style.position = "fixed";
+                    textarea.style.opacity = "0";
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand("copy");
+                    textarea.remove();
+                }
+            }
+
+            document.querySelectorAll("[data-copy-from]").forEach((button) => {
+                button.addEventListener("click", async () => {
+                    await copyText(document.getElementById(button.dataset.copyFrom).textContent);
+                    button.classList.add("is-copied");
+                    copyStatus.textContent = "Copied to clipboard";
+                    clearTimeout(button._copyTimer);
+                    button._copyTimer = setTimeout(() => {
+                        button.classList.remove("is-copied");
+                        copyStatus.textContent = "";
+                    }, 1200);
+                });
+            });
+
+            // ---------- Init ----------
+
+            applyPageTheme(root.dataset.theme);
+            syncForm();
+            renderLog();
+
+            window.colorPicker = new YKColorPicker({
+                target: TARGETS[state.target],
+                color: state.color,
+                ...pickerOptions(),
+                ...handlers,
+            });
+        </script>
+    </body>
 </html>

@@ -63,6 +63,10 @@
 .yk-overlay-wrapper--open {
   opacity: 1;
   visibility: visible;
+  /* Become visible immediately so open() can focus the cursor; closing still fades out */
+  transition:
+    opacity 300ms,
+    visibility 0s;
 }
 
 .yk-overlay-wrapper:not(.yk-overlay-wrapper--static) {

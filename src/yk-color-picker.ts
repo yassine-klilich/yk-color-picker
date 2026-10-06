@@ -128,7 +128,8 @@ export class YKColorPicker {
   private _onMouseUpCursorBind: any;
   private _copyTimeout: any = null;
   private _prevColor: any = null;
-  private _targetKeydownOpen: boolean = false;
+  private _onKeyDownCloseBind: any;
+  private _enterKeyDownWhileOpen: boolean = false;
 
   constructor(options: YKColorPickerOptions) {
     this._options = YKColorPicker._buildOptions(
@@ -176,11 +177,16 @@ export class YKColorPicker {
 
   open() {
     this._isOpen = true;
+    this._enterKeyDownWhileOpen = false;
     this._prevColor = this.getHEX();
     if (this._options.container) {
       this._attachToContainer(true);
     } else {
       this._attachToBody();
+    }
+    // _attachToBody closes the picker when the target is outside the viewport
+    if (!this._isOpen) {
+      return;
     }
     this._dom.overlayWrapper.classList.add("yk-overlay-wrapper--open");
     this._dom.cursor.focus();
@@ -188,6 +194,9 @@ export class YKColorPicker {
   }
 
   close(options?: CloseOptions) {
+    if (!this._isOpen) {
+      return;
+    }
     if (!this._dc) {
       if (this._prevColor != this.getHEX()) {
         this._options.onChange && this._options.onChange(this);
@@ -326,6 +335,7 @@ export class YKColorPicker {
     this._dom["overlayWrapper"] = cp_overlayWrapper;
 
     this._onKeyUpCloseBind = this._onKeyUpClose.bind(this);
+    this._onKeyDownCloseBind = this._onKeyDownClose.bind(this);
     this._onResizeScrollWindowBind = this._onResizeScrollWindow.bind(this);
     this._onClickCloseBind = this.close.bind(this);
 
@@ -870,10 +880,14 @@ export class YKColorPicker {
     this._updateTheme(this._options.theme);
     this._updateGUI();
     this._updatePosition();
-    attachEvent(window, "resize", this._onResizeScrollWindowBind);
-    attachEvent(window, "scroll", this._onResizeScrollWindowBind);
-    attachEvent(document, "click", this._onClickCloseBind);
-    attachEvent(document, "keyup", this._onKeyUpCloseBind);
+    // Only listen for close triggers while open, otherwise a closed picker fires onClose/onChange
+    if (this._isOpen) {
+      attachEvent(window, "resize", this._onResizeScrollWindowBind);
+      attachEvent(window, "scroll", this._onResizeScrollWindowBind);
+      attachEvent(document, "click", this._onClickCloseBind);
+      attachEvent(document, "keydown", this._onKeyDownCloseBind);
+      attachEvent(document, "keyup", this._onKeyUpCloseBind);
+    }
     if (parent != overlayWrapper.parentElement) {
       this._options.onContainerChange &&
         this._options.onContainerChange(this, parent);
@@ -937,7 +951,6 @@ export class YKColorPicker {
 
   private _onClickTarget(event: MouseEvent) {
     event.stopPropagation();
-    this._targetKeydownOpen = true;
     this._isOpen ? this.close() : this.open();
   }
 
@@ -1906,11 +1919,20 @@ export class YKColorPicker {
     }
   }
 
+  private _onKeyDownClose(event: KeyboardEvent) {
+    if (event.key == "Enter") {
+      this._enterKeyDownWhileOpen = true;
+    }
+  }
+
   private _onKeyUpClose(event: KeyboardEvent) {
     const { target, key } = event;
-    if (this._targetKeydownOpen && key == "Enter") {
-      this._targetKeydownOpen = false;
-      return;
+    if (key == "Enter") {
+      // Ignore the release of an Enter press that started before opening (e.g. Enter on the target)
+      if (!this._enterKeyDownWhileOpen) {
+        return;
+      }
+      this._enterKeyDownWhileOpen = false;
     }
 
     if (
@@ -1958,6 +1980,7 @@ export class YKColorPicker {
   private _removeWindowEvents() {
     window.removeEventListener("resize", this._onResizeScrollWindowBind);
     window.removeEventListener("scroll", this._onResizeScrollWindowBind);
+    document.removeEventListener("keydown", this._onKeyDownCloseBind);
     document.removeEventListener("keyup", this._onKeyUpCloseBind);
     document.removeEventListener("click", this._onClickCloseBind);
   }
