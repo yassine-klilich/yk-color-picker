@@ -342,6 +342,79 @@
                 font-size: 13px;
                 color: var(--text-2);
             }
+            .target-row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+            }
+            .target-candidate {
+                transition: opacity 0.15s;
+            }
+            .target-candidate[inert] {
+                opacity: 0.35;
+            }
+            .swatch-target {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 52px;
+                height: 52px;
+                padding: 0;
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+                cursor: pointer;
+            }
+            .swatch-target .swatch {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+            }
+            .input-target {
+                width: 120px;
+                height: 52px;
+                padding: 0 12px;
+                font-family: var(--mono);
+                font-size: 13px;
+                text-align: center;
+                color: var(--text);
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+                cursor: pointer;
+                outline: none;
+            }
+            .input-target:focus-visible {
+                outline: 2px solid var(--text);
+                outline-offset: 2px;
+            }
+            .inline-host:empty {
+                display: none;
+            }
+            .method-bar {
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 12px 14px;
+                border-top: 1px solid var(--border);
+                background: color-mix(in srgb, var(--surface) 85%, transparent);
+            }
+            .method-bar-label {
+                margin-right: 4px;
+                font-size: 12px;
+                color: var(--text-3);
+            }
+            .method-bar .btn {
+                font-family: var(--mono);
+                background: var(--surface);
+            }
             .swatch {
                 position: relative;
                 flex: none;
@@ -425,6 +498,9 @@
             }
             .field.is-invalid .text-input {
                 border-color: var(--danger);
+            }
+            .field.is-disabled {
+                opacity: 0.45;
             }
             .input-wrap {
                 position: relative;
@@ -736,6 +812,14 @@
                 font-size: 11px;
                 color: var(--text-2);
             }
+            .event-log li.is-call .log-name {
+                font-weight: 500;
+                color: var(--text-2);
+            }
+            .event-log li.is-call .log-name::before {
+                content: "→ ";
+                color: var(--text-3);
+            }
             .event-log .log-empty {
                 display: block;
                 padding: 16px 8px;
@@ -868,16 +952,31 @@
                     <span id="stage-status">Closed</span>
                 </div>
                 <div class="stage-center">
-                    <button id="color-picker-trigger" class="trigger" type="button">
-                        <span class="swatch" aria-hidden="true"></span>
-                        <span>Pick a color</span>
-                        <span class="trigger-hex" id="trigger-hex"></span>
-                    </button>
+                    <div class="target-row">
+                        <button id="color-picker-trigger" class="trigger target-candidate" data-target-key="button" type="button">
+                            <span class="swatch" aria-hidden="true"></span>
+                            <span>Pick a color</span>
+                            <span class="trigger-hex" id="trigger-hex"></span>
+                        </button>
+                        <button id="target-swatch" class="swatch-target target-candidate" data-target-key="swatch" type="button" aria-label="Pick a color">
+                            <span class="swatch" aria-hidden="true"></span>
+                        </button>
+                        <input id="target-input" class="input-target target-candidate" data-target-key="input" type="text" readonly aria-label="Picked color" />
+                    </div>
+                    <div class="inline-host" id="inline-host"></div>
                     <ul class="kbd-hints" aria-label="Keyboard shortcuts">
                         <li><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> move cursor</li>
                         <li><kbd>Enter</kbd> confirm</li>
                         <li><kbd>Esc</kbd> revert &amp; close</li>
                     </ul>
+                </div>
+                <div class="method-bar" id="method-bar" role="group" aria-label="Methods">
+                    <span class="method-bar-label">Methods</span>
+                    <button class="btn btn-outline" type="button" data-method="open">open()</button>
+                    <button class="btn btn-outline" type="button" data-method="close">close()</button>
+                    <button class="btn btn-outline" type="button" data-method="setColor" title="Sets a random color">setColor()</button>
+                    <button class="btn btn-outline" type="button" data-method="getColor">getColor()</button>
+                    <button class="btn btn-outline" type="button" data-method="isOpen">isOpen()</button>
                 </div>
             </section>
 
@@ -898,6 +997,24 @@
                     </div>
 
                     <fieldset class="field">
+                        <legend class="field-label">target</legend>
+                        <div class="segmented">
+                            <label><input type="radio" name="target" value="button" /><span>Button</span></label>
+                            <label><input type="radio" name="target" value="swatch" /><span>Swatch</span></label>
+                            <label><input type="radio" name="target" value="input" /><span>Input</span></label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="field">
+                        <legend class="field-label">container</legend>
+                        <div class="segmented">
+                            <label><input type="radio" name="container" value="popup" /><span>Popup</span></label>
+                            <label><input type="radio" name="container" value="inline" /><span>Inline</span></label>
+                        </div>
+                        <p class="field-help">Popup floats next to the target. Inline renders the picker inside the playground.</p>
+                    </fieldset>
+
+                    <fieldset class="field" data-popup-only>
                         <legend class="field-label">position</legend>
                         <div class="segmented">
                             <label><input type="radio" name="position" value="t" /><span>Top</span></label>
@@ -907,7 +1024,7 @@
                         </div>
                     </fieldset>
 
-                    <div class="field" id="fallback-field">
+                    <div class="field" id="fallback-field" data-popup-only>
                         <label class="field-label" for="opt-fallback">positionFallback</label>
                         <input class="text-input" id="opt-fallback" type="text" maxlength="4" spellcheck="false" aria-describedby="fallback-help fallback-error" />
                         <p class="field-help" id="fallback-help">Order to try when there's no room. Any of <code>b t l r</code>, no repeats.</p>
@@ -932,7 +1049,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="field">
+                    <fieldset class="field" data-popup-only>
                         <legend class="field-label">Close behavior</legend>
                         <label class="switch-row">
                             <span class="switch-text">closeOnScroll<small>Close when the page scrolls</small></span>
@@ -1029,10 +1146,20 @@
                 theme: document.documentElement.dataset.theme,
                 closeOnScroll: true,
                 closeOnResize: false,
+                target: "button",
+                container: "popup",
             };
             const EVENTS = ["onInit", "onOpen", "onClose", "onInput", "onChange", "onCopy", "onRepresentationChange", "onTargetChange", "onContainerChange"];
+            const TARGETS = { button: "#color-picker-trigger", swatch: "#target-swatch", input: "#target-input" };
+            const INLINE_CONTAINER = "#inline-host";
+            // Options passed straight to the picker; target and container are mapped separately
+            const PICKER_KEYS = ["position", "positionFallback", "representation", "theme", "closeOnScroll", "closeOnResize"];
 
             const state = { ...DEFAULTS };
+
+            function pickerOptions() {
+                return Object.fromEntries(PICKER_KEYS.map((key) => [key, state[key]]));
+            }
 
             const root = document.documentElement;
             const optionsPanel = document.getElementById("options-panel");
@@ -1043,6 +1170,7 @@
             const closeScrollInput = document.getElementById("opt-close-scroll");
             const closeResizeInput = document.getElementById("opt-close-resize");
             const triggerHex = document.getElementById("trigger-hex");
+            const targetInput = document.getElementById("target-input");
             const stageStatus = document.getElementById("stage-status");
             const eventChips = document.getElementById("event-chips");
             const eventLog = document.getElementById("event-log");
@@ -1086,6 +1214,7 @@
                 const values = formatColor(instance);
                 root.style.setProperty("--picked", values.hex);
                 triggerHex.textContent = values.hex;
+                targetInput.value = values.hex;
                 for (const format of ["hex", "rgb", "hsv", "hsl"]) {
                     document.getElementById(`value-${format}`).textContent = values[format];
                 }
@@ -1129,15 +1258,23 @@
                 clearTimeout(chip._flashTimer);
                 chip._flashTimer = setTimeout(() => chip.classList.remove("is-flashing"), 250);
 
+                pushLog(name, detail, "event");
+            }
+
+            function logCall(name, detail) {
+                pushLog(name, detail, "call");
+            }
+
+            function pushLog(name, detail, kind) {
                 // Collapse bursts (e.g. dragging fires onInput continuously) into one row
                 const last = logEntries[0];
                 const time = new Date().toLocaleTimeString([], { hour12: false });
-                if (last && last.name === name) {
+                if (last && last.name === name && last.kind === kind) {
                     last.repeat++;
                     last.detail = detail;
                     last.time = time;
                 } else {
-                    logEntries.unshift({ name, detail, time, repeat: 1 });
+                    logEntries.unshift({ name, detail, time, kind, repeat: 1 });
                     logEntries.length = Math.min(logEntries.length, MAX_LOG);
                 }
                 renderLog();
@@ -1154,6 +1291,7 @@
                 }
                 for (const entry of logEntries) {
                     const li = document.createElement("li");
+                    li.classList.toggle("is-call", entry.kind === "call");
                     const time = document.createElement("span");
                     time.className = "log-time";
                     time.textContent = entry.time;
@@ -1207,8 +1345,8 @@
                     renderCode();
                     logEvent("onRepresentationChange", state.representation);
                 },
-                onTargetChange: () => logEvent("onTargetChange"),
-                onContainerChange: () => logEvent("onContainerChange"),
+                onTargetChange: (instance) => logEvent("onTargetChange", instance.target ? `#${instance.target.id}` : "null"),
+                onContainerChange: () => logEvent("onContainerChange", state.container === "inline" ? INLINE_CONTAINER : "body"),
             };
 
             // ---------- Generated code ----------
@@ -1219,7 +1357,8 @@
 
             function renderCode() {
                 const lines = [
-                    ["target", '"#color-picker-trigger"', "str"],
+                    ["target", `"${TARGETS[state.target]}"`, "str"],
+                    ...(state.container === "inline" ? [["container", `"${INLINE_CONTAINER}"`, "str"]] : []),
                     ["color", `"${state.color}"`, "str"],
                     ["position", `"${state.position}"`, "str"],
                     ["positionFallback", `"${state.positionFallback}"`, "str"],
@@ -1274,9 +1413,50 @@
                 syncRadios("position", state.position);
                 syncRadios("representation", state.representation);
                 syncRadios("theme", state.theme);
+                syncRadios("target", state.target);
+                syncRadios("container", state.container);
                 colorField.classList.remove("is-invalid");
                 fallbackField.classList.remove("is-invalid");
                 renderActiveFormat();
+                renderTargets();
+                renderContainerFields();
+            }
+
+            // Only the active target is interactive; the others are shown dimmed
+            function renderTargets() {
+                document.querySelectorAll(".target-candidate").forEach((element) => {
+                    element.inert = element.dataset.targetKey !== state.target;
+                });
+            }
+
+            // Position and close options only affect the popup
+            function renderContainerFields() {
+                const inline = state.container === "inline";
+                document.querySelectorAll("[data-popup-only]").forEach((field) => {
+                    field.classList.toggle("is-disabled", inline);
+                    field.querySelectorAll("input").forEach((input) => (input.disabled = inline));
+                });
+            }
+
+            function setTarget(key) {
+                state.target = key;
+                renderTargets();
+                colorPicker.updateOptions({ target: TARGETS[key] });
+                renderCode();
+            }
+
+            function setContainer(mode) {
+                state.container = mode;
+                renderContainerFields();
+                if (mode === "inline") {
+                    colorPicker.updateOptions({ container: INLINE_CONTAINER });
+                    // The inline picker is only visible while open
+                    if (!colorPicker.isOpen()) colorPicker.open();
+                } else {
+                    // An open inline picker stays open and becomes a popup next to its target
+                    colorPicker.updateOptions({ container: null });
+                }
+                renderCode();
             }
 
             function setOption(key, value) {
@@ -1319,17 +1499,54 @@
             document.querySelectorAll('input[name="theme"]').forEach((input) => {
                 input.addEventListener("change", () => setOption("theme", input.value));
             });
+            document.querySelectorAll('input[name="target"]').forEach((input) => {
+                input.addEventListener("change", () => setTarget(input.value));
+            });
+            document.querySelectorAll('input[name="container"]').forEach((input) => {
+                input.addEventListener("change", () => setContainer(input.value));
+            });
             closeScrollInput.addEventListener("change", () => setOption("closeOnScroll", closeScrollInput.checked));
             closeResizeInput.addEventListener("change", () => setOption("closeOnResize", closeResizeInput.checked));
 
             document.getElementById("reset-options").addEventListener("click", () => {
+                const previous = { target: state.target, container: state.container };
                 // Reset the picker theme to match the page rather than the theme at load time
                 Object.assign(state, DEFAULTS, { theme: root.dataset.theme });
-                const { color, ...rest } = state;
-                colorPicker.updateOptions(rest);
-                colorPicker.setColor(color);
+                if (previous.container !== state.container) setContainer(state.container);
+                if (previous.target !== state.target) setTarget(state.target);
+                colorPicker.updateOptions(pickerOptions());
+                colorPicker.setColor(state.color);
                 syncForm();
                 renderCode();
+            });
+
+            // ---------- Methods ----------
+
+            function randomHex() {
+                return `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, "0")}`;
+            }
+
+            function formatResult(value) {
+                return typeof value === "string" ? value : JSON.stringify(value).replace(/"/g, "").replace(/,/g, ", ");
+            }
+
+            document.getElementById("method-bar").addEventListener("click", (e) => {
+                // Clicks here must not reach the document, which closes an open popup
+                e.stopPropagation();
+                const button = e.target.closest("[data-method]");
+                if (!button) return;
+                const method = button.dataset.method;
+                // Log calls first so the events they trigger appear above them
+                if (method === "setColor") {
+                    const hex = randomHex();
+                    logCall(`setColor("${hex}")`);
+                    colorPicker.setColor(hex);
+                } else if (method === "open" || method === "close") {
+                    logCall(`${method}()`);
+                    colorPicker[method]();
+                } else {
+                    logCall(`${method}()`, formatResult(colorPicker[method]()));
+                }
             });
 
             // ---------- Copy buttons ----------
@@ -1369,8 +1586,9 @@
             renderLog();
 
             window.colorPicker = new YKColorPicker({
-                target: document.getElementById("color-picker-trigger"),
-                ...state,
+                target: TARGETS[state.target],
+                color: state.color,
+                ...pickerOptions(),
                 ...handlers,
             });
         </script>
