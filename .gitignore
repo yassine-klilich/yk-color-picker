@@ -24,4 +24,7 @@
 # dependencies
 node_modules/
 
+# Playwright MCP snapshots and logs
+.playwright-mcp/
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
