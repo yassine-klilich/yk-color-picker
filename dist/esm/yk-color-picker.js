@@ -48,10 +48,9 @@ const u = {
   },
   compileRGB: function(n) {
     let t, e, o, i;
-    const s = /rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)\s*(\s+(0?(\.\d+)?|1(\.0*)?)\s*)?\)/i;
-    if (s.test(n)) {
-      const r = n.split(s).filter((g) => !isNaN(parseInt(g)) && g != "" && g != null);
-      if (t = parseInt(r[0]), e = parseInt(r[1]), o = parseInt(r[2]), i = parseFloat(r[3]), t > 255)
+    const s = /^rgba?\(\s*(\d+)(?:\s*,\s*|\s+)(\d+)(?:\s*,\s*|\s+)(\d+)(?:(?:\s*[,/]\s*|\s+)(0|1|0?\.\d+|1\.0+))?\s*\)$/i, r = n.match(s);
+    if (r) {
+      if (t = parseInt(r[1]), e = parseInt(r[2]), o = parseInt(r[3]), i = parseFloat(r[4]), t > 255)
         throw new RangeError(
           `YKColorParser:: '${n}' --> ${t} has an invalid red color, it must be an interger between 0 and 255`
         );

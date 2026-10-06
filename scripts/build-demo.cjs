@@ -18,9 +18,10 @@ function replaceOnce(from, to) {
     html = html.replace(from, to);
 }
 
+// The ?v= query busts browser caches on the published demo, since dist paths no longer change per release
 replaceOnce(
     `        </script>${eol}        <style>`,
-    `        </script>${eol}        <link rel="stylesheet" href="./dist/umd2020-${version}/style.css" />${eol}        <script src="./dist/umd2020-${version}/yk-color-picker.js"></script>${eol}        <style>`
+    `        </script>${eol}        <link rel="stylesheet" href="./dist/umd/style.css?v=${version}" />${eol}        <script src="./dist/umd/yk-color-picker.js?v=${version}"></script>${eol}        <style>`
 );
 replaceOnce(`        <script type="module">${eol}            import { YKColorPicker } from "yk-color-picker";${eol}${eol}`, `        <script>${eol}`);
 replaceOnce("new YKColorPicker({", "new YK.YKColorPicker({");

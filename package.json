@@ -1,15 +1,18 @@
 {
   "name": "yk-color-picker",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "YKColorPicker is a lightweight and flexible color picker library designed with a strong focus on user experience (UX), including full keyboard interaction support. It provides a seamless way to integrate a customizable color picker into your project, offering various color models such as RGB, HSV, HSL, and HEX.",
-  "main": "dist/umd2020-2.0.0/yk-color-picker.js",
-  "module": "dist/esm2020-2.0.0/yk-color-picker.js",
+  "main": "dist/umd/yk-color-picker.js",
+  "module": "dist/esm/yk-color-picker.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm2020-2.0.0/yk-color-picker.js",
-      "require": "./dist/umd2020-2.0.0/yk-color-picker.js"
-    }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/esm/yk-color-picker.js",
+      "require": "./dist/umd/yk-color-picker.js"
+    },
+    "./style.css": "./dist/esm/style.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
@@ -19,6 +22,7 @@
     "start": "node node_modules/vite/bin/vite.js",
     "build": "node node_modules/vite/bin/vite.js build",
     "build:demo": "node scripts/build-demo.cjs",
+    "prepublishOnly": "npm run build",
     "publish:verdaccio": "npm publish --registry http://localhost:4873",
     "publish:npm": "npm set registry https://registry.npmjs.org/ && npm publish"
   },
