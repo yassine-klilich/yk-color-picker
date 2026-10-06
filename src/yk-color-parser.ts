@@ -56,17 +56,17 @@ export const YKColorParser = {
   compileRGB: function (color: string) {
     let r, g, b, a;
 
+    // Channels separated by commas or spaces; optional alpha after a comma, a space or a slash,
+    // e.g. "rgb(255, 0, 0)", "rgba(255, 0, 0, 0.5)", "rgb(255 0 0)", "rgb(255 0 0 / 0.5)"
     const regexRGB =
-      /rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)\s*(\s+(0?(\.\d+)?|1(\.0*)?)\s*)?\)/i;
+      /^rgba?\(\s*(\d+)(?:\s*,\s*|\s+)(\d+)(?:\s*,\s*|\s+)(\d+)(?:(?:\s*[,/]\s*|\s+)(0|1|0?\.\d+|1\.0+))?\s*\)$/i;
 
-    if (regexRGB.test(color)) {
-      const splitColor = color
-        .split(regexRGB)
-        .filter((i) => !isNaN(parseInt(i)) && i != "" && i != null);
-      r = parseInt(splitColor[0]);
-      g = parseInt(splitColor[1]);
-      b = parseInt(splitColor[2]);
-      a = parseFloat(splitColor[3]);
+    const match = color.match(regexRGB);
+    if (match) {
+      r = parseInt(match[1]);
+      g = parseInt(match[2]);
+      b = parseInt(match[3]);
+      a = parseFloat(match[4]);
 
       if (r > 255) {
         throw new RangeError(

@@ -3,14 +3,8 @@ import { defineConfig } from "vite";
 import path from "path";
 import dts from "vite-plugin-dts";
 import { cleandir } from "rollup-plugin-cleandir";
-import fs from "fs";
 
-// Read the version from package.json
-const packageJson = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "package.json"), "utf-8")
-);
-const version = packageJson.version;
-
+// Output folders are unversioned so consumer import paths stay stable across releases
 export default defineConfig({
   build: {
     esbuild: {
@@ -26,13 +20,13 @@ export default defineConfig({
       output: [
         {
           format: "es",
-          dir: `dist/esm2020-${version}`,
+          dir: "dist/esm",
           entryFileNames: "yk-color-picker.js",
           preserveModules: false,
         },
         {
           format: "umd",
-          dir: `dist/umd2020-${version}`,
+          dir: "dist/umd",
           entryFileNames: "yk-color-picker.js",
           name: "YK",
           strict: true,
