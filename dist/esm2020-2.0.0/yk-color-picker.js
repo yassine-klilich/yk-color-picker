@@ -1,4 +1,4 @@
-function w(n) {
+function v(n) {
   return n.toString(16).padStart(2, "0");
 }
 function c(n, t, e) {
@@ -35,8 +35,8 @@ const u = {
     } else {
       const { r: t, g: e, b: o, a: i } = n;
       if (t >= 0 && t <= 255 && e >= 0 && e <= 255 && o >= 0 && o <= 255 && i >= 0 && i <= 1) {
-        const { h: s, s: r, v: a } = u.RGBtoHSV(t, e, o);
-        return { h: s, s: r, v: a, a: i };
+        const { h: s, s: r, v: h } = u.RGBtoHSV(t, e, o);
+        return { h: s, s: r, v: h, a: i };
       }
       throw new Error(
         "YKColorParser:: The provided RGB object has invalid values, please make sure red, green, blue are between 0 and 255 and alpha value is between 0 and 1"
@@ -63,8 +63,8 @@ const u = {
         throw new RangeError(
           `YKColorParser:: '${n}' --> ${o} has an invalid blue color, it must be an interger between 0 and 255`
         );
-      const { h: a, s: d, v: _ } = u.RGBtoHSV(t, e, o);
-      return { h: a, s: d, v: _, a: isNaN(i) ? 1 : i };
+      const { h, s: d, v: _ } = u.RGBtoHSV(t, e, o);
+      return { h, s: d, v: _, a: isNaN(i) ? 1 : i };
     }
     throw new SyntaxError(
       `YKColorParser:: '${n}' is an invalid RGB format`
@@ -73,14 +73,14 @@ const u = {
   compileHEX: function(n) {
     const t = u.HEXtoRGBA(n);
     if (t) {
-      const { r: e, g: o, b: i, a: s } = t, { h: r, s: a, v: d } = u.RGBtoHSV(e, o, i);
-      return { h: r, s: a, v: d, a: s };
+      const { r: e, g: o, b: i, a: s } = t, { h: r, s: h, v: d } = u.RGBtoHSV(e, o, i);
+      return { h: r, s: h, v: d, a: s };
     }
     throw new Error(`YKColorParser:: '${n}' is an invalid HEX format`);
   },
   RGBtoHSV: function(n, t, e) {
     n /= 255, t /= 255, e /= 255;
-    let o = Math.max(n, t, e), i = Math.min(n, t, e), s = 0, r = 0, a = o, d = o - i;
+    let o = Math.max(n, t, e), i = Math.min(n, t, e), s = 0, r = 0, h = o, d = o - i;
     if (r = o == 0 ? 0 : d / o, o == i)
       s = 0;
     else {
@@ -97,7 +97,7 @@ const u = {
       }
       s /= 6;
     }
-    return s = s * 360, r = r * 100, a = a * 100, { h: s, s: r, v: a };
+    return s = s * 360, r = r * 100, h = h * 100, { h: s, s: r, v: h };
   },
   HSLtoHSV: function(n, t, e) {
     t /= 100, e /= 100;
@@ -133,14 +133,14 @@ const u = {
     }
   },
   RGBAtoHEX: function(n, t, e, o) {
-    return `#${w(p(n, 0, 255))}${w(
+    return `#${v(p(n, 0, 255))}${v(
       p(t, 0, 255)
-    )}${w(p(e, 0, 255))}${o < 1 ? w(Math.round(o * 255)) : ""}`;
+    )}${v(p(e, 0, 255))}${o < 1 ? v(Math.round(o * 255)) : ""}`;
   },
   HSVtoRGB: function(n, t, e) {
     n /= 360, t /= 100, e /= 100;
-    let o = 0, i = 0, s = 0, r, a, d, _, g;
-    switch (r = Math.floor(n * 6), a = n * 6 - r, d = e * (1 - t), _ = e * (1 - a * t), g = e * (1 - (1 - a) * t), r % 6) {
+    let o = 0, i = 0, s = 0, r, h, d, _, g;
+    switch (r = Math.floor(n * 6), h = n * 6 - r, d = e * (1 - t), _ = e * (1 - h * t), g = e * (1 - (1 - h) * t), r % 6) {
       case 0:
         o = e, i = g, s = d;
         break;
@@ -356,11 +356,11 @@ class R {
     return u.RGBAtoHEX(t, e, o, this.a);
   }
 }
-var A = /* @__PURE__ */ ((n) => (n.TOP = "t", n.BOTTOM = "b", n.LEFT = "l", n.RIGHT = "r", n))(A || {}), P = /* @__PURE__ */ ((n) => (n.RGB = "rgb", n.HSV = "hsv", n.HSL = "hsl", n.HEX = "hex", n))(P || {});
-const h = class h {
+var O = /* @__PURE__ */ ((n) => (n.TOP = "t", n.BOTTOM = "b", n.LEFT = "l", n.RIGHT = "r", n))(O || {}), A = /* @__PURE__ */ ((n) => (n.RGB = "rgb", n.HSV = "hsv", n.HSL = "hsl", n.HEX = "hex", n))(A || {});
+const a = class a {
   constructor(t) {
-    this._isOpen = !1, this._options = h.DEFAULT_OPTIONS, this._color = new R(0, 0, 0, 1), this._dom = {}, this._copyTimeout = null, this._prevColor = null, this._targetKeydownOpen = !1, this._options = h._buildOptions(
-      h.DEFAULT_OPTIONS,
+    this._isOpen = !1, this._options = a.DEFAULT_OPTIONS, this._color = new R(0, 0, 0, 1), this._dom = {}, this._copyTimeout = null, this._prevColor = null, this._enterKeyDownWhileOpen = !1, this._options = a._buildOptions(
+      a.DEFAULT_OPTIONS,
       t
     );
     const { target: e, representation: o } = this._options;
@@ -385,10 +385,10 @@ const h = class h {
     return this._isOpen;
   }
   open() {
-    this._isOpen = !0, this._prevColor = this.getHEX(), this._options.container ? this._attachToContainer(!0) : this._attachToBody(), this._dom.overlayWrapper.classList.add("yk-overlay-wrapper--open"), this._dom.cursor.focus(), this._options.onOpen && this._options.onOpen(this);
+    this._isOpen = !0, this._enterKeyDownWhileOpen = !1, this._prevColor = this.getHEX(), this._options.container ? this._attachToContainer(!0) : this._attachToBody(), this._isOpen && (this._dom.overlayWrapper.classList.add("yk-overlay-wrapper--open"), this._dom.cursor.focus(), this._options.onOpen && this._options.onOpen(this));
   }
   close(t) {
-    this._dc || (this._prevColor != this.getHEX() && this._options.onChange && this._options.onChange(this), this._detachOverlay(t), this._options.onClose && this._options.onClose(this)), this._dc = !1;
+    this._isOpen && (this._dc || (this._prevColor != this.getHEX() && this._options.onChange && this._options.onChange(this), this._detachOverlay(t), this._options.onClose && this._options.onClose(this)), this._dc = !1);
   }
   getRGB() {
     return { ...this._color.toRGB(), a: this._color.a };
@@ -415,7 +415,7 @@ const h = class h {
     return this._color.toHEX();
   }
   updateOptions(t) {
-    const e = h._buildOptions(this._options, t);
+    const e = a._buildOptions(this._options, t);
     this._options = e, t.hasOwnProperty("theme") && this._updateTheme(e.theme), t.hasOwnProperty("representation") && this._updateRepresentation(e.representation), (t.hasOwnProperty("position") || t.hasOwnProperty("positionFallback")) && t.hasOwnProperty("container") == !1 && this._updatePosition(), t.hasOwnProperty("container") && (t.container ? this._attachToContainer(!0) : this._attachToBody()), t.hasOwnProperty("target") && this._updateTarget(t.target), t.hasOwnProperty("color") && t.color && this.setColor(t.color);
   }
   getColor() {
@@ -461,7 +461,7 @@ const h = class h {
       t,
       "click",
       (o) => o.stopPropagation()
-    ), this._dom.overlayWrapper = t, this._onKeyUpCloseBind = this._onKeyUpClose.bind(this), this._onResizeScrollWindowBind = this._onResizeScrollWindow.bind(this), this._onClickCloseBind = this.close.bind(this), this._options.container ? this._attachToContainer(!1) : document.body.appendChild(this._dom.overlayWrapper), this._options.onInit && this._options.onInit(this);
+    ), this._dom.overlayWrapper = t, this._onKeyUpCloseBind = this._onKeyUpClose.bind(this), this._onKeyDownCloseBind = this._onKeyDownClose.bind(this), this._onResizeScrollWindowBind = this._onResizeScrollWindow.bind(this), this._onClickCloseBind = this.close.bind(this), this._options.container ? this._attachToContainer(!1) : document.body.appendChild(this._dom.overlayWrapper), this._options.onInit && this._options.onInit(this);
   }
   _updateGUI() {
     this._updateCursorThumb(), this._updateInputs(), this._updateColorPreview(!1), this._updateHueThumb(), this._updateOpacityThumb();
@@ -515,14 +515,14 @@ const h = class h {
       id: "yk-color-input-4"
     }), r = c("label", ["yk-color-model-label"], {
       for: "yk-color-input-1"
-    }), a = c("label", ["yk-color-model-label"], {
+    }), h = c("label", ["yk-color-model-label"], {
       for: "yk-color-input-2"
     }), d = c("label", ["yk-color-model-label"], {
       for: "yk-color-input-3"
     }), _ = c("label", ["yk-color-model-label"], {
       for: "yk-color-input-4"
     }), g = this._currentRepresentation.toUpperCase();
-    return r.textContent = g[0], a.textContent = g[1], d.textContent = g[2], _.textContent = "A", t.appendChild(e), t.appendChild(o), t.appendChild(i), t.appendChild(s), t.appendChild(r), t.appendChild(a), t.appendChild(d), t.appendChild(_), l(e, "focus", this._onFocusInput.bind(this)), l(e, "keydown", this._onKeyDownInputA.bind(this)), l(e, "input", this._onInputA.bind(this)), l(e, "change", this._onChangeInputA.bind(this)), l(o, "focus", this._onFocusInput.bind(this)), l(o, "keydown", this._onKeyDownInputB.bind(this)), l(o, "input", this._onInputB.bind(this)), l(o, "change", this._onChangeInputB.bind(this)), l(i, "focus", this._onFocusInput.bind(this)), l(i, "keydown", this._onKeyDownInputC.bind(this)), l(i, "input", this._onInputC.bind(this)), l(i, "change", this._onChangeInputC.bind(this)), l(s, "keydown", this._onKeyDownAlphaInput.bind(this)), l(s, "input", this._onKeyUpAlphaInput.bind(this)), l(s, "change", this._onChangeAlphaInput.bind(this)), this._dom.inputA = e, this._dom.inputB = o, this._dom.inputC = i, this._dom.inputAlpha = s, t;
+    return r.textContent = g[0], h.textContent = g[1], d.textContent = g[2], _.textContent = "A", t.appendChild(e), t.appendChild(o), t.appendChild(i), t.appendChild(s), t.appendChild(r), t.appendChild(h), t.appendChild(d), t.appendChild(_), l(e, "focus", this._onFocusInput.bind(this)), l(e, "keydown", this._onKeyDownInputA.bind(this)), l(e, "input", this._onInputA.bind(this)), l(e, "change", this._onChangeInputA.bind(this)), l(o, "focus", this._onFocusInput.bind(this)), l(o, "keydown", this._onKeyDownInputB.bind(this)), l(o, "input", this._onInputB.bind(this)), l(o, "change", this._onChangeInputB.bind(this)), l(i, "focus", this._onFocusInput.bind(this)), l(i, "keydown", this._onKeyDownInputC.bind(this)), l(i, "input", this._onInputC.bind(this)), l(i, "change", this._onChangeInputC.bind(this)), l(s, "keydown", this._onKeyDownAlphaInput.bind(this)), l(s, "input", this._onKeyUpAlphaInput.bind(this)), l(s, "change", this._onChangeAlphaInput.bind(this)), this._dom.inputA = e, this._dom.inputB = o, this._dom.inputC = i, this._dom.inputAlpha = s, t;
   }
   _updateOpacityThumb() {
     const { opacitySlider: t, opacityThumb: e } = this._dom;
@@ -570,8 +570,8 @@ const h = class h {
     }
   }
   _updateColorPreview(t) {
-    const e = this._color.a, o = this._color.toHSL(), { palette: i, opacitySlider: s, colorPreview: r } = this._dom, a = `hsl(${o.h}deg 100% 50% / 1)`;
-    i.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${a} 100%)`;
+    const e = this._color.a, o = this._color.toHSL(), { palette: i, opacitySlider: s, colorPreview: r } = this._dom, h = `hsl(${o.h}deg 100% 50% / 1)`;
+    i.style.backgroundImage = `linear-gradient(180deg, transparent 0%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(255,255,255,1) 0%, ${h} 100%)`;
     const d = `hsl(${o.h}, ${o.s}%, ${o.l}%)`;
     s.style.setProperty(
       "background-image",
@@ -640,25 +640,25 @@ const h = class h {
   _rgbUpdateView() {
     this._updateColorPreview(!0), this._updateHueThumb(), this._updateCursorThumb();
   }
-  _updateHEXColorSection(t, e, o, i, s, r, a) {
+  _updateHEXColorSection(t, e, o, i, s, r, h) {
     const d = e.target, { rgb: _, hex: g } = this._color;
     if (o(_[t], i)) {
-      _[t] = s(_[t], 1), this._color.hex = g.substring(0, r) + w(p(_[t], 0, 255)) + g.substring(a);
+      _[t] = s(_[t], 1), this._color.hex = g.substring(0, r) + v(p(_[t], 0, 255)) + g.substring(h);
       const { r: k, g: S, b: H } = _;
       this._color.hsv = u.RGBtoHSV(k, S, H), this._rgbUpdateView();
     }
-    d.value = this._color.hex, d.setSelectionRange(r, a), e.preventDefault();
+    d.value = this._color.hex, d.setSelectionRange(r, h), e.preventDefault();
   }
   _updateHEXAlphaSection(t, e, o, i) {
-    const s = t.target, { hex: r, a } = this._color;
-    e(a, o) && (this._color.a = parseFloat(i(a, 0.01).toFixed(2)), s.value = this._color.hex = r.substring(0, 7) + w(p(this._color.a * 255, 0, 255)), this._updateColorPreview(!0), this._updateOpacityThumb()), s.value = this._color.hex, s.setSelectionRange(7, 9), t.preventDefault();
+    const s = t.target, { hex: r, a: h } = this._color;
+    e(h, o) && (this._color.a = parseFloat(i(h, 0.01).toFixed(2)), s.value = this._color.hex = r.substring(0, 7) + v(p(this._color.a * 255, 0, 255)), this._updateColorPreview(!0), this._updateOpacityThumb()), s.value = this._color.hex, s.setSelectionRange(7, 9), t.preventDefault();
   }
   _updateOpacityValue(t) {
     this._color.a = parseFloat(t.toFixed(2)), this._currentRepresentation == "hex" ? (this._updateHEXColor(), this._updateHEXInput()) : this._dom.inputAlpha.value = this._color.a, this._updateColorPreview(!0);
   }
   _updatePosition() {
     if (this._dom.target != null) {
-      if (!h._isTargetInViewport(this._dom.target)) {
+      if (!a._isTargetInViewport(this._dom.target)) {
         this.close();
         return;
       }
@@ -680,7 +680,7 @@ const h = class h {
   _attachToBody() {
     this._removeWindowEvents();
     const { overlayWrapper: t } = this._dom, e = t.parentElement;
-    document.body.appendChild(t), t.classList.remove("yk-overlay-wrapper--static"), this._updateTheme(this._options.theme), this._updateGUI(), this._updatePosition(), l(window, "resize", this._onResizeScrollWindowBind), l(window, "scroll", this._onResizeScrollWindowBind), l(document, "click", this._onClickCloseBind), l(document, "keyup", this._onKeyUpCloseBind), e != t.parentElement && this._options.onContainerChange && this._options.onContainerChange(this, e);
+    document.body.appendChild(t), t.classList.remove("yk-overlay-wrapper--static"), this._updateTheme(this._options.theme), this._updateGUI(), this._updatePosition(), this._isOpen && (l(window, "resize", this._onResizeScrollWindowBind), l(window, "scroll", this._onResizeScrollWindowBind), l(document, "click", this._onClickCloseBind), l(document, "keydown", this._onKeyDownCloseBind), l(document, "keyup", this._onKeyUpCloseBind)), e != t.parentElement && this._options.onContainerChange && this._options.onContainerChange(this, e);
   }
   _detachOverlay(t) {
     var e;
@@ -718,7 +718,7 @@ const h = class h {
     }
   }
   _onClickTarget(t) {
-    t.stopPropagation(), this._targetKeydownOpen = !0, this._isOpen ? this.close() : this.open();
+    t.stopPropagation(), this._isOpen ? this.close() : this.open();
   }
   _onMouseDownCursor(t) {
     this._dc = !0, l(document, "pointermove", this._onMouseMoveCursorBind), l(document, "pointerup", this._onMouseUpCursorBind), this._onMouseMoveCursorBind(t);
@@ -818,61 +818,61 @@ const h = class h {
           i <= 5 ? o < 2 ? this._updateHEXColorSection(
             "r",
             t,
-            h._lt,
+            a._lt,
             255,
-            h._add,
+            a._add,
             1,
             3
           ) : o < 3 ? this._updateHEXColorSection(
             "g",
             t,
-            h._lt,
+            a._lt,
             255,
-            h._add,
+            a._add,
             3,
             5
           ) : o <= 4 && i <= 4 || o < 4 ? this._updateHEXColorSection(
             "b",
             t,
-            h._lt,
+            a._lt,
             255,
-            h._add,
+            a._add,
             5,
             7
           ) : o <= 5 && this._updateHEXAlphaSection(
             t,
-            h._lt,
+            a._lt,
             1,
-            h._add
+            a._add
           ) : o < 3 ? this._updateHEXColorSection(
             "r",
             t,
-            h._lt,
+            a._lt,
             255,
-            h._add,
+            a._add,
             1,
             3
           ) : o < 5 ? this._updateHEXColorSection(
             "g",
             t,
-            h._lt,
+            a._lt,
             255,
-            h._add,
+            a._add,
             3,
             5
           ) : o <= 7 && i == 7 || o < 7 ? this._updateHEXColorSection(
             "b",
             t,
-            h._lt,
+            a._lt,
             255,
-            h._add,
+            a._add,
             5,
             7
           ) : o <= 9 && this._updateHEXAlphaSection(
             t,
-            h._lt,
+            a._lt,
             1,
-            h._add
+            a._add
           );
         }
         break;
@@ -885,61 +885,61 @@ const h = class h {
           i <= 5 ? o < 2 ? this._updateHEXColorSection(
             "r",
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub,
+            a._sub,
             1,
             3
           ) : o < 3 ? this._updateHEXColorSection(
             "g",
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub,
+            a._sub,
             3,
             5
           ) : o <= 4 && i <= 4 || o < 4 ? this._updateHEXColorSection(
             "b",
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub,
+            a._sub,
             5,
             7
           ) : o <= 5 && this._updateHEXAlphaSection(
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub
+            a._sub
           ) : o < 3 ? this._updateHEXColorSection(
             "r",
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub,
+            a._sub,
             1,
             3
           ) : o < 5 ? this._updateHEXColorSection(
             "g",
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub,
+            a._sub,
             3,
             5
           ) : o <= 7 && i == 7 || o < 7 ? this._updateHEXColorSection(
             "b",
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub,
+            a._sub,
             5,
             7
           ) : o <= 9 && this._updateHEXAlphaSection(
             t,
-            h._gt,
+            a._gt,
             0,
-            h._sub
+            a._sub
           );
         }
         break;
@@ -1051,8 +1051,8 @@ const h = class h {
           case "hsl":
             {
               const { h: i, s, l: r } = this._color.getHSL();
-              let a = s;
-              a < 100 && (++a, this._color.hsl.s = a, this._color.hsv = u.HSLtoHSV(i, a, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = a + "%", this._dom.inputC.value = this._color.hsl.l + "%");
+              let h = s;
+              h < 100 && (++h, this._color.hsl.s = h, this._color.hsv = u.HSLtoHSV(i, h, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputC.value = this._color.hsl.l + "%");
             }
             break;
         }
@@ -1076,8 +1076,8 @@ const h = class h {
           case "hsl":
             {
               const { h: i, s, l: r } = this._color.getHSL();
-              let a = s;
-              a > 0 && (--a, this._color.hsl.s = a, this._color.hsv = u.HSLtoHSV(i, a, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = a + "%", this._dom.inputC.value = this._color.hsl.l + "%");
+              let h = s;
+              h > 0 && (--h, this._color.hsl.s = h, this._color.hsv = u.HSLtoHSV(i, h, r), this._color.hsl.l = this.getHSL().l, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputC.value = this._color.hsl.l + "%");
             }
             break;
         }
@@ -1142,8 +1142,8 @@ const h = class h {
           case "hsl":
             {
               const { h: i, s, l: r } = this._color.getHSL();
-              let a = r;
-              a < 100 && (++a, this._color.hsl.l = a, this._color.hsv = u.HSLtoHSV(i, s, a), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = a + "%", this._dom.inputB.value = this._color.hsl.s + "%");
+              let h = r;
+              h < 100 && (++h, this._color.hsl.l = h, this._color.hsv = u.HSLtoHSV(i, s, h), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputB.value = this._color.hsl.s + "%");
             }
             break;
         }
@@ -1167,8 +1167,8 @@ const h = class h {
           case "hsl":
             {
               const { h: i, s, l: r } = this._color.getHSL();
-              let a = r;
-              r > 0 && (--a, this._color.hsl.l = a, this._color.hsv = u.HSLtoHSV(i, s, a), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = a + "%", this._dom.inputB.value = this._color.hsl.s + "%");
+              let h = r;
+              r > 0 && (--h, this._color.hsl.l = h, this._color.hsv = u.HSLtoHSV(i, s, h), this._color.hsl.s = this.getHSL().s, this._updateColorPreview(!0), this._updateCursorThumb(), e.value = h + "%", this._dom.inputB.value = this._color.hsl.s + "%");
             }
             break;
         }
@@ -1291,11 +1291,15 @@ const h = class h {
         break;
     }
   }
+  _onKeyDownClose(t) {
+    t.key == "Enter" && (this._enterKeyDownWhileOpen = !0);
+  }
   _onKeyUpClose(t) {
     const { target: e, key: o } = t;
-    if (this._targetKeydownOpen && o == "Enter") {
-      this._targetKeydownOpen = !1;
-      return;
+    if (o == "Enter") {
+      if (!this._enterKeyDownWhileOpen)
+        return;
+      this._enterKeyDownWhileOpen = !1;
     }
     if (o == "Enter" && this._isOpen && ![this._dom.copyColor, this._dom.btnSwitch].includes(e)) {
       this.close();
@@ -1311,7 +1315,7 @@ const h = class h {
     if (e == "scroll" && i || e == "resize" && s)
       this.close();
     else {
-      if (!h._isTargetInViewport(o)) {
+      if (!a._isTargetInViewport(o)) {
         this.close({
           preventFocusTarget: !0
         });
@@ -1321,7 +1325,7 @@ const h = class h {
     }
   }
   _removeWindowEvents() {
-    window.removeEventListener("resize", this._onResizeScrollWindowBind), window.removeEventListener("scroll", this._onResizeScrollWindowBind), document.removeEventListener("keyup", this._onKeyUpCloseBind), document.removeEventListener("click", this._onClickCloseBind);
+    window.removeEventListener("resize", this._onResizeScrollWindowBind), window.removeEventListener("scroll", this._onResizeScrollWindowBind), document.removeEventListener("keydown", this._onKeyDownCloseBind), document.removeEventListener("keyup", this._onKeyUpCloseBind), document.removeEventListener("click", this._onClickCloseBind);
   }
   _getCursorPosition(t, e) {
     const o = this._dom.palette.getBoundingClientRect();
@@ -1361,27 +1365,27 @@ const h = class h {
     const { position: t, positionFallback: e } = this._options, { target: o } = this._dom;
     if (!o || !t)
       return { x: 0, y: 0 };
-    const i = e || h.DEFAULT_OPTIONS.positionFallback;
+    const i = e || a.DEFAULT_OPTIONS.positionFallback;
     if (!/^[btlr]+$/.test(i) || /(.).*\1/.test(i))
       throw new Error(
         "YKColorPicker:: Invalid positionFallback value. It must only contain the characters 'b' (bottom), 't' (top), 'l' (left), and 'r' (right) without any repetition. Examples of a valid value: 'btrl', 'lr', or just one character for example 'b' to force at one position."
       );
-    const s = o.getBoundingClientRect(), r = this._dom.overlayWrapper.getBoundingClientRect(), a = document.documentElement.scrollTop, d = document.documentElement.scrollLeft, _ = 6;
+    const s = o.getBoundingClientRect(), r = this._dom.overlayWrapper.getBoundingClientRect(), h = document.documentElement.scrollTop, d = document.documentElement.scrollLeft, _ = 6;
     let g = t;
-    const k = h._enoughSpace(
-      () => a + s.top,
+    const k = a._enoughSpace(
+      () => h + s.top,
       () => s.top,
       r.height + _
-    ), S = h._enoughSpace(
-      () => h._getPageHeight() - (a + s.top + s.height),
+    ), S = a._enoughSpace(
+      () => a._getPageHeight() - (h + s.top + s.height),
       () => window.innerHeight - (s.top + s.height),
       r.height + _
-    ), H = h._enoughSpace(
+    ), H = a._enoughSpace(
       () => d + s.left,
       () => s.left,
       r.width + _
-    ), x = h._enoughSpace(
-      () => h._getPageWidth() - (d + s.left + s.width),
+    ), x = a._enoughSpace(
+      () => a._getPageWidth() - (d + s.left + s.width),
       () => window.innerWidth - (s.left + s.width),
       r.width + _
     ), M = {
@@ -1391,12 +1395,12 @@ const h = class h {
       r: x
     };
     let f = "";
-    for (let v = 0; v < i.length; v++)
-      f += i[v] + M[i[v]];
+    for (let w = 0; w < i.length; w++)
+      f += i[w] + M[i[w]];
     let y = "", C = "";
-    for (let v = 1; v < f.length; v += 2) {
-      const T = f[v];
-      T == "2" && (y = y + f[v - 1]), T == "1" && (C = C + f[v - 1]);
+    for (let w = 1; w < f.length; w += 2) {
+      const T = f[w];
+      T == "2" && (y = y + f[w - 1]), T == "1" && (C = C + f[w - 1]);
     }
     y != "" ? y.includes(g) == !1 && (g = y[0]) : C != "" ? C.includes(g) == !1 && (g = C[0]) : g = "b";
     let b = 0, m = 0;
@@ -1498,7 +1502,7 @@ const h = class h {
     return t - e;
   }
 };
-h.DEFAULT_OPTIONS = {
+a.DEFAULT_OPTIONS = {
   target: null,
   container: null,
   position: "b",
@@ -1527,10 +1531,10 @@ h.DEFAULT_OPTIONS = {
   onContainerChange: () => {
   }
 };
-let I = h;
+let I = a;
 export {
   I as YKColorPicker,
-  P as YKColorPickerMode,
-  A as YKColorPickerPosition
+  A as YKColorPickerMode,
+  O as YKColorPickerPosition
 };
 //# sourceMappingURL=yk-color-picker.js.map

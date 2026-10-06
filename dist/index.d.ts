@@ -31,7 +31,8 @@ export declare class YKColorPicker {
     private _onMouseUpCursorBind;
     private _copyTimeout;
     private _prevColor;
-    private _targetKeydownOpen;
+    private _onKeyDownCloseBind;
+    private _enterKeyDownWhileOpen;
     constructor(options: YKColorPickerOptions);
     get options(): YKColorPickerOptions;
     get target(): HTMLElement | null;
@@ -151,6 +152,7 @@ export declare class YKColorPicker {
     private _onMouseMoveOpacitySlider;
     private _onKeyDownHueSlider;
     private _onKeyDownOpacitySlider;
+    private _onKeyDownClose;
     private _onKeyUpClose;
     private _onResizeScrollWindow;
     private _removeWindowEvents;
